@@ -45,7 +45,7 @@ class LifeRecorder:
         """Writes life log to file."""
 
         no_record = self.check_for_no_record()
-        with open(self.file_name, 'a') as file_object:
+        with open(self.file_name, 'a+') as file_object:
             if no_record:
                 write_headers(file_object)
             file_object.write(f"{record}\n")
@@ -84,8 +84,11 @@ class LifeRecorder:
         Function returns the boolean value indicating whether there is any
         records in the file.
         """
-        with open(self.file_name, 'r') as file_object:
-            return file_object.read() == ""
+        try:
+            with open(self.file_name, 'r') as file_object:
+                return file_object.read() == ""
+        except FileNotFoundError:
+            return False
 
 
 if __name__ == "__main__":
