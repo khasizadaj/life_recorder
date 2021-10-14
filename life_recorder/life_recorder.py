@@ -86,11 +86,7 @@ class LifeRecorder:
         """
         try:
             with open(self.file_name, 'r') as file_object:
-<<<<<<< HEAD
                 return file_object.read() != ""
-=======
-                return file_object.read() == ""
->>>>>>> 627f149495d03f53e7e5b172f56696dfe79ccd60
         except FileNotFoundError:
             return False
 
