@@ -7,7 +7,7 @@ from life_recorder.helper import (generate_record_string, get_identifier,
 class LifeRecorder:
     """Class that implements writing and reading of life records."""
 
-    _file_name = "life_records.csv"
+    _file_name = "life_records.json"
     input_messages = {
         "tag": "What is the tag of this record?: ",
         "content": "What do you want to remember? ",
