@@ -1,21 +1,19 @@
 """This module contains LifeRecorder class which is used to work with records."""
 
-from life_recorder.helper import (generate_life_record_string, get_identifier,
+from life_recorder.helper import (generate_record_string, get_identifier,
                                   print_line_of_record, write_headers)
 
 
 class LifeRecorder:
     """Class that implements writing and reading of life records."""
 
+    _file_name = "life_records.csv"
     input_messages = {
         "tag": "What is the tag of this record?: ",
         "content": "What do you want to remember? ",
         "read": "How many rows do you want to read?",
         "action": "What do you want to do, read (r) or write (w)? ",
     }
-
-    def __init__(self, file_name):
-        self._file_name = file_name
 
     def get_input_message(self, input_type: str):
         """Function returns the input message for the given input type."""
@@ -25,13 +23,13 @@ class LifeRecorder:
 
         return self.input_messages[input_type]
 
-    def add_life_record(self) -> None:
+    def add_record(self) -> None:
         """Add a new life record to file"""
 
-        record = self.get_life_record()
-        self.write_life_record(record)
+        record = self.get_record()
+        self.write_record(record)
 
-    def get_life_record(self):
+    def get_record(self):
         """Function adds new log to the file and returns the last added log."""
 
         # ask for tag of record
@@ -43,11 +41,11 @@ class LifeRecorder:
         content = input(input_message)
 
         # create life record
-        record = generate_life_record_string(tag, content)
+        record = generate_record_string(tag, content)
 
         return record
 
-    def write_life_record(self, record: str) -> None:
+    def write_record(self, record: str) -> None:
         """Writes life log to file."""
 
         records_exist = self.check_for_record()
@@ -58,7 +56,14 @@ class LifeRecorder:
 
         print(f"Last life log: {record}")
 
-    def read_records(self, row_count: int = None) -> None:
+    def get_all_records(self):
+        with open(self.file_name, 'r') as file_object:
+            return file_object.read().split("\n")
+
+    def get_single_record(self, identifier: int) -> str:
+        raise NotImplementedError()
+
+    def read_records(self, identifier: int = None) -> None:
         """
         Function reads given amount (`row_count`) of records from the beginning
         of the file. If row_count is not specified it reads the whole document.
@@ -66,18 +71,13 @@ class LifeRecorder:
         Header of the file is not taken into account as a record.
         """
 
-        if row_count is None:
-            # it represents infinite number of records
-            row_count = 100_000
+        if identifier is not None:
+            record = self.get_single_record(identifier)
+            print(record)
 
-        with open(self.file_name, 'r') as file_object:
-            for i in range(row_count + 1):
-                identifier = get_identifier(i)
-                curr_record = file_object.readline().strip("\n")
-                if curr_record == "":
-                    return None
-                print_line_of_record(identifier, curr_record)
-
+        for record in self.get_all_records():
+            print(record)
+        
         return None
 
     @property

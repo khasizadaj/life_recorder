@@ -10,7 +10,7 @@ def get_timestamp() -> str:
     return datetime.now().strftime("%d-%b-%Y %H:%M")
 
 
-def generate_life_record_string(tag: str, content: str):
+def generate_record_string(tag: str, content: str):
     """Returns formatted life log."""
 
     timestamp = get_timestamp()
