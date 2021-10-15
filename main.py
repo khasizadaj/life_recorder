@@ -1,22 +1,31 @@
 """Module is used to run LifeRecorder class and record some memories."""
+import sys
+from typing import Callable, List
 
 from life_recorder.life_recorder import LifeRecorder
 
 
-def main() -> None:
+def main(args: List[str]) -> None:
     """Functions gets the record and writes it to the file."""
     file_name = "life_records.csv"
-    one_life = LifeRecorder(file_name)
+    life_recorder = LifeRecorder(file_name)
 
-    # get life record
-    life_record = one_life.get_life_record()
-
-    # write life record
-    one_life.write_life_record(life_record)
+    action_arg = args[1]
+    action_func = action_factory(action_arg, life_recorder)
+    action_func()
 
     # read all records
-    one_life.read_records(3)
+    life_recorder.read_records()
+
+
+def action_factory(action: str, life_recorder: LifeRecorder) -> Callable:
+    """Factory that decides which action to perform."""
+
+    if action == "add":
+        return life_recorder.add_life_record
 
 
 if __name__ == '__main__':
-    main()
+    # get action arg from command line
+    arguments = sys.argv
+    main(arguments)

@@ -21,9 +21,15 @@ class LifeRecorder:
         """Function returns the input message for the given input type."""
 
         if input_type not in self.input_messages.keys():
-            raise KeyError("There is no such input type: %s" % input_type)
+            raise KeyError(f"There is no such input type: {input_type}")
 
         return self.input_messages[input_type]
+
+    def add_life_record(self) -> None:
+        """Add a new life record to file"""
+
+        record = self.get_life_record()
+        self.write_life_record(record)
 
     def get_life_record(self):
         """Function adds new log to the file and returns the last added log."""
