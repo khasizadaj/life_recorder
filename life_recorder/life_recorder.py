@@ -1,10 +1,13 @@
 """This module contains LifeRecorder class which is used to work with records."""
+"""TODO Adding unique identifier for each record. (get_identifier method)"""
+import json
+from typing import Dict
+from abc import ABC, abstractmethod
 
-from life_recorder.helper import (generate_record_string, get_identifier,
-                                  print_line_of_record, write_headers)
+from life_recorder import helper
 
 
-class LifeRecorder:
+class LifeRecorder(ABC):
     """Class that implements writing and reading of life records."""
 
     _file_name = "life_records.json"
@@ -15,6 +18,28 @@ class LifeRecorder:
         "action": "What do you want to do, read (r) or write (w)? ",
     }
 
+    def __init__(self):
+        self._records = self.get_records()
+
+    @abstractmethod
+    def act(self):
+        """Implement main purpose of the current class."""
+
+    @property
+    def records(self):
+        """Function returns records saved so far."""
+
+        return self._records
+
+    def get_records(self):
+        """This property return a dictionary of records."""
+
+        try:
+            with open(self._file_name, "r") as file:
+                return json.load(file)
+        except FileNotFoundError:
+            return {}
+
     def get_input_message(self, input_type: str):
         """Function returns the input message for the given input type."""
 
@@ -23,11 +48,30 @@ class LifeRecorder:
 
         return self.input_messages[input_type]
 
-    def add_record(self) -> None:
+    def save_records(self, records: str) -> None:
+        """Writes life log to file."""
+
+        with open(self.file_name, "w") as output:
+            json.dump(records, output)
+
+    @property
+    def file_name(self):
+        """Function returns the file name variable."""
+        return self._file_name
+
+
+class AddLifeRecorder(LifeRecorder):
+    """Implements adding life records to the file."""
+
+    def act(self) -> None:
         """Add a new life record to file"""
 
         record = self.get_record()
-        self.write_record(record)
+        curr_records = helper.update_records(self.records, record)
+        self.save_records(curr_records)
+
+        print(
+            f"Last life record: #{record['id']}: {record['tag']} - {record['content']}")
 
     def get_record(self):
         """Function adds new log to the file and returns the last added log."""
@@ -41,31 +85,32 @@ class LifeRecorder:
         content = input(input_message)
 
         # create life record
-        record = generate_record_string(tag, content)
+        record = self.create_record_dict(tag, content)
 
         return record
 
-    def write_record(self, record: str) -> None:
-        """Writes life log to file."""
+    def get_identifier(self, i):
+        return i
 
-        records_exist = self.check_for_record()
-        with open(self.file_name, 'a+') as file_object:
-            if records_exist is False:
-                write_headers(file_object)
-            file_object.write(f"{record}\n")
+    def create_record_dict(self, tag: str, content: str):
+        """Returns dictionary of record."""
+        identifier = self.get_identifier("5")
+        timestamp = helper.get_timestamp()
 
-        print(f"Last life log: {record}")
+        return {
+            "id": identifier,
+            "timestamp": timestamp,
+            "tag": tag,
+            "content": content
+        }
 
-    def get_all_records(self):
-        with open(self.file_name, 'r') as file_object:
-            return file_object.read().split("\n")
 
-    def get_single_record(self, identifier: int) -> str:
-        raise NotImplementedError()
+class ReadLifeRecorder(LifeRecorder):
+    """Implements reading life records from the file."""
 
-    def read_records(self, identifier: int = None) -> None:
+    def act(self, identifier: int = None) -> None:
         """
-        Function reads given amount (`row_count`) of records from the beginning
+        Function reads given amount of records (`row_count`) from the beginning
         of the file. If row_count is not specified it reads the whole document.
 
         Header of the file is not taken into account as a record.
@@ -73,28 +118,22 @@ class LifeRecorder:
 
         if identifier is not None:
             record = self.get_single_record(identifier)
-            print(record)
+            helper.print_pretty_record(record)
+            return
 
         for record in self.get_all_records():
-            print(record)
-        
-        return None
+            helper.print_pretty_record(record)
+        return
 
-    @property
-    def file_name(self):
-        """Function returns the file name variable."""
-        return self._file_name
+    def get_all_records(self):
+        """Function return all records that saved so far."""
 
-    def check_for_record(self) -> bool:
-        """
-        Function returns the boolean value indicating whether there is any
-        records in the file.
-        """
-        try:
-            with open(self.file_name, 'r') as file_object:
-                return file_object.read() != ""
-        except FileNotFoundError:
-            return False
+        return self.records.values()
+
+    def get_single_record(self, identifier) -> Dict:
+        """Returns dictionary of single record that matches given identifier."""
+
+        return self.records[identifier]
 
 
 if __name__ == "__main__":

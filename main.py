@@ -1,27 +1,38 @@
 """Module is used to run LifeRecorder class and record some memories."""
 import sys
-from typing import Callable, List
+from typing import List
+from loguru import logger
 
-from life_recorder.life_recorder import LifeRecorder
+from life_recorder.life_recorder import AddLifeRecorder, ReadLifeRecorder
 
 
+@logger.catch
 def main(args: List[str]) -> None:
     """Functions gets the record and writes it to the file."""
-    
-    life_recorder = LifeRecorder()
 
     action_arg = args[1]
-    action_func = action_factory(action_arg, life_recorder)
-    action_func()
+    try:
+        identifier = args[2]
+    except IndexError:
+        identifier = None
+
+    action = action_factory(action_arg)
+
+    if identifier is None:
+        action().act()
+    else:
+        action().act(identifier)
 
 
-def action_factory(action: str, life_recorder: LifeRecorder) -> Callable:
+def action_factory(action: str):
     """Factory that decides which action to perform."""
 
     if action == "add":
-        return life_recorder.add_record
+        return AddLifeRecorder
     elif action == "read":
-        return life_recorder.read_records
+        return ReadLifeRecorder
+    else:
+        raise NotImplementedError()
 
 
 if __name__ == '__main__':
