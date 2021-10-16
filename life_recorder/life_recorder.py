@@ -1,8 +1,9 @@
-"""This module contains LifeRecorder class which is used to work with records."""
-"""TODO Adding unique identifier for each record. (get_identifier method)"""
-import json
-from typing import Dict
+"""This module contains LifeRecorder class which is used to work with records.
+TODO Adding unique identifier for each record. (get_identifier method)"""
+
 from abc import ABC, abstractmethod
+from typing import Dict
+import json
 
 from life_recorder import helper
 
