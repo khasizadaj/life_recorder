@@ -1,7 +1,7 @@
 """Module contains helper functions for LifeRecorder class."""
 
 from datetime import datetime
-from typing import Union
+from typing import Union, Dict
 
 
 def get_timestamp() -> str:
@@ -9,24 +9,17 @@ def get_timestamp() -> str:
 
     return datetime.now().strftime("%d-%b-%Y %H:%M")
 
+def update_records(records: Dict, new_record: Dict) -> Dict:
+    """Function adds record to the records dictionary"""
 
-def generate_record_string(tag: str, content: str):
-    """Returns formatted life log."""
+    records[new_record["id"]] = new_record
 
-    timestamp = get_timestamp()
-    return f"{timestamp}; {tag}; {content}"
+    return records
 
-
-def write_headers(file_object) -> None:
-    """Writes headers to the file."""
-
-    file_object.write("timestamp; tag; content\n")
-
-
-def print_line_of_record(identifier: str, record: str) -> None:
+def print_pretty_record(record: str) -> None:
     """Prints a record with provided identifier (id)."""
 
-    print(f"{identifier} | {record}")
+    print(f"#{record['id']} {record['tag']} - {record['content']}")
 
 
 def get_identifier(row_num: int) -> Union[str, int]:
