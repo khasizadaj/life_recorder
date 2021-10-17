@@ -1,8 +1,8 @@
 """Module contains class that adds new records to the database."""
 
-from typing import Dict, Tuple
+from typing import Tuple
 
-from .import life_recorder, helper
+from . import life_recorder, helper
 
 
 class UpdateLifeRecorder(life_recorder.LifeRecorder):
@@ -12,15 +12,14 @@ class UpdateLifeRecorder(life_recorder.LifeRecorder):
         """Add a new life record to database."""
 
         old_record = helper.get_record(self.records, str(identifier))
-        assert isinstance(old_record['id'], int)
 
         print(
             f"Current record: #{old_record['id']}: {old_record['tag']} - {old_record['content']}")
         print('If you want to keep any value untouched, press "Enter".')
 
         tag, content = self.get_record_details()
-        record = self.construct_record_dict(old_record["id"], old_record["timestamp"],
-                                            tag, content)
+        record = helper.construct_record_dict(old_record["id"], old_record["timestamp"],
+                                              tag, content)
 
         updated_database = helper.update_database(self.database, record)
         self.save_records(updated_database)
@@ -41,17 +40,6 @@ class UpdateLifeRecorder(life_recorder.LifeRecorder):
 
         # return user inputs
         return tag, content
-
-    @staticmethod
-    def construct_record_dict(identifier: str, timestamp: str, tag: str, content: str) -> Dict:
-        """Returns dictionary of record."""
-
-        return {
-            "id": identifier,
-            "timestamp": timestamp,
-            "tag": tag,
-            "content": content
-        }
 
 
 if __name__ == "__main__":

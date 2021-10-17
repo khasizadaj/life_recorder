@@ -19,6 +19,17 @@ def update_database(database: Dict, record: Dict) -> Dict:
     return cp_database
 
 
+def construct_record_dict(identifier: str, timestamp: str, tag: str, content: str) -> Dict:
+    """Returns dictionary of record."""
+
+    return {
+        "id": identifier,
+        "timestamp": timestamp,
+        "tag": tag,
+        "content": content
+    }
+
+
 def delete_record(database: Dict, identifier: str) -> Dict:
     """Function deletes record from database with given identifier."""
 

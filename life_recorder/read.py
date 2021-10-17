@@ -27,7 +27,7 @@ class ReadLifeRecorder(LifeRecorder):
         for record in self.get_all_records():
             helper.print_pretty_record(record)
 
-    def get_all_records(self):
+    def get_all_records(self) -> Dict:
         """Function return all records from the database."""
 
         return self.records.values()
