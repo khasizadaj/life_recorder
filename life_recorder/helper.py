@@ -1,7 +1,7 @@
 """Module contains helper functions for LifeRecorder class."""
 
 from datetime import datetime
-from typing import Union, Dict
+from typing import Dict
 
 
 def get_timestamp() -> str:
@@ -9,22 +9,31 @@ def get_timestamp() -> str:
 
     return datetime.now().strftime("%d-%b-%Y %H:%M")
 
-def update_records(records: Dict, new_record: Dict) -> Dict:
-    """Function adds record to the records dictionary"""
 
-    records[new_record["id"]] = new_record
+def update_database(database: Dict, record: Dict) -> Dict:
+    """Function updates database."""
+    cp_database = database.copy()
 
-    return records
+    cp_database["records"][str(record["id"])] = record
+
+    return cp_database
+
+
+def delete_record(database: Dict, identifier: str) -> Dict:
+    """Function deletes record from database with given identifier."""
+
+    cp_database = database.copy()
+    del cp_database["records"][identifier]
+    return cp_database
+
+
+def get_record(records: Dict, identifier: str) -> Dict:
+    """Returns dictionary of single record that matches given identifier."""
+
+    return records.get(identifier, None)
+
 
 def print_pretty_record(record: str) -> None:
     """Prints a record with provided identifier (id)."""
 
     print(f"#{record['id']} {record['tag']} - {record['content']}")
-
-
-def get_identifier(row_num: int) -> Union[str, int]:
-    """Returns the identifier of the given row"""
-
-    if row_num == 0:
-        return "+"
-    return row_num
