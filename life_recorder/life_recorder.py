@@ -15,8 +15,7 @@ class LifeRecorder:
         "content": "What do you want to remember? ",
         "read": "How many rows do you want to read?",
         "action": "What do you want to do, read (r) or write (w)? ",
-        "delete": "Are you sure you want to delete this record? [Y(y) / N(n)] ",
-
+        "delete": "Are you sure you want to delete this record? [Y(y) / N(n)] "
     }
 
     def __init__(self):
@@ -24,10 +23,13 @@ class LifeRecorder:
 
     def act(self, identifier: str = None):
         """This method implements main purpose of current class."""
+
         raise NotImplementedError()
 
     @property
     def database(self):
+        """Function return database attribute of the class."""
+
         return self._database
 
     @property
@@ -39,6 +41,7 @@ class LifeRecorder:
     @property
     def file_name(self):
         """Function returns the file name variable."""
+
         return self._file_name
 
     def load_database(self):
@@ -48,7 +51,7 @@ class LifeRecorder:
             with open(self._file_name, "r") as file:
                 return json.load(file)
         except FileNotFoundError:
-            return {}
+            return self.get_empty_database()
 
     def get_input_message(self, input_type: str):
         """Function returns the input message for the given input type."""
@@ -63,6 +66,15 @@ class LifeRecorder:
 
         with open(self.file_name, "w") as output:
             json.dump(records, output)
+
+    @staticmethod
+    def get_empty_database():
+        """Function returns an empty database to start saving data."""
+
+        return {
+            "last_id": 0,
+            "records": {}
+        }
 
 
 if __name__ == "__main__":
