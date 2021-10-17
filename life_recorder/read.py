@@ -1,6 +1,6 @@
 """Module contains class that reads record(s) from the database."""
 
-from typing import Dict, Optional
+from typing import Dict
 
 from .life_recorder import LifeRecorder
 from . import helper
