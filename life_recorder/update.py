@@ -1,6 +1,6 @@
 """Module contains class that adds new records to the database."""
 
-from typing import Tuple
+from typing import Tuple, Dict
 
 from . import life_recorder, helper
 
@@ -18,6 +18,8 @@ class UpdateLifeRecorder(life_recorder.LifeRecorder):
         print('If you want to keep any value untouched, press "Enter".')
 
         tag, content = self.get_record_details()
+        tag, content = self.check_new_tag_and_content(old_record, tag, content)
+
         record = helper.construct_record_dict(old_record["id"], old_record["timestamp"],
                                               tag, content)
 
@@ -26,6 +28,20 @@ class UpdateLifeRecorder(life_recorder.LifeRecorder):
 
         print(
             f"Updated life record: #{record['id']}: {record['tag']} - {record['content']}")
+
+    def check_new_tag_and_content(self, old_record: Dict, tag: str, content: str):
+        """
+        Check if provided tag and content are really new ones. 
+        If empty value is provide, it means that user doesn't wanna change it.
+        """
+
+        if tag == "":
+            tag = old_record['tag']
+
+        if content == "":
+            content = old_record['content']
+
+        return tag, content
 
     def get_record_details(self) -> Tuple:
         """Function gets and returns inputs from user."""
