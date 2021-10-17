@@ -3,7 +3,26 @@ import sys
 from typing import List
 from loguru import logger
 
-from life_recorder.life_recorder import AddLifeRecorder, ReadLifeRecorder
+from life_recorder.read import ReadLifeRecorder
+from life_recorder.add import AddLifeRecorder
+from life_recorder.update import UpdateLifeRecorder
+from life_recorder.delete import DeleteLifeRecorder
+
+
+def life_factory(action: str):
+    """Factory that decides which action to perform."""
+
+    if action == "add":
+        return AddLifeRecorder
+    elif action == "read":
+        return ReadLifeRecorder
+    elif action == "update":
+        return UpdateLifeRecorder
+    elif action == "delete":
+        return DeleteLifeRecorder
+    else:
+        print(
+            f'Unfortunately we don\'t have such an action. \nTried action was "{action}"\nWe support these actions: add, read, read <id>, update, delete.')
 
 
 @logger.catch
@@ -16,26 +35,16 @@ def main(args: List[str]) -> None:
     except IndexError:
         identifier = None
 
-    action = action_factory(action_arg)
+    action = life_factory(action_arg)
 
-    if identifier is None:
-        action().act()
-    else:
+    try:
         action().act(identifier)
-
-
-def action_factory(action: str):
-    """Factory that decides which action to perform."""
-
-    if action == "add":
-        return AddLifeRecorder
-    elif action == "read":
-        return ReadLifeRecorder
-    else:
-        raise NotImplementedError()
+    except TypeError:
+        sys.exit()
 
 
 if __name__ == '__main__':
     # get action arg from command line
     arguments = sys.argv
+    # arguments = ["", "read", "8"]
     main(arguments)
