@@ -47,4 +47,6 @@ def get_record(records: Dict, identifier: str) -> Dict:
 def print_pretty_record(record: str) -> None:
     """Prints a record with provided identifier (id)."""
 
-    print(f"#{record['id']} {record['tag']} - {record['content']}")
+    print(
+        f"Id: #{record['id']} \nTimestamp: {record['timestamp']} \nTag: {record['tag']} \nContent: {record['content']}"
+    )
