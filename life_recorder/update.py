@@ -1,5 +1,6 @@
 """Module contains class that adds new records to the database."""
 
+import sys
 from typing import Tuple, Dict
 
 from . import life_recorder, helper
@@ -11,14 +12,25 @@ class UpdateLifeRecorder(life_recorder.LifeRecorder):
     def act(self, identifier: int = None) -> None:
         """Add a new life record to database."""
 
+        if identifier is None:
+            print("In order to update any record, you need to specify an identifier.")
+            print()
+            sys.exit()
+
         old_record = helper.get_record(self.records, str(identifier))
 
+        if old_record is None:
+            print("Provided identifier didn't match with any record.")
+            print()
+            sys.exit()
+
         print(
-            f"Current record: #{old_record['id']}: {old_record['tag']} - {old_record['content']}")
+            f"Current record: #{old_record['id']}: {old_record['tag']} - {old_record['content']}"
+        )
         print('If you want to keep any value untouched, press "Enter".')
 
-        tag, content = self.get_record_details()
-        tag, content = self.check_new_tag_and_content(old_record, tag, content)
+        tag, content = self.check_new_tag_and_content(
+            old_record, *self.get_record_details())
 
         record = helper.construct_record_dict(old_record["id"], old_record["timestamp"],
                                               tag, content)

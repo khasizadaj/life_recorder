@@ -1,5 +1,6 @@
 """Module contains class that reads record(s) from the database."""
 
+import sys
 from typing import Dict
 
 from .life_recorder import LifeRecorder
@@ -19,13 +20,16 @@ class ReadLifeRecorder(LifeRecorder):
             record = helper.get_record(self.records, identifier)
             if record is None:
                 print("Provided identifier didn't match with any record.")
-                return
+                print()
+                sys.exit()
 
             helper.print_pretty_record(record)
+            print()
             return
 
         for record in self.get_all_records():
             helper.print_pretty_record(record)
+            print()
 
     def get_all_records(self) -> Dict:
         """Function return all records from the database."""

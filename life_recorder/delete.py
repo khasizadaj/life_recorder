@@ -14,6 +14,7 @@ class DeleteLifeRecorder(life_recorder.LifeRecorder):
 
         if identifier is None:
             print("In order to delete any record, you need to specify an identifier.")
+            print()
             sys.exit()
 
         old_record = helper.get_record(self.records, str(identifier))
