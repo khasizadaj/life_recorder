@@ -1,19 +1,21 @@
 """Module is used to run LifeRecorder class and record some memories."""
+
 import sys
-from typing import List
+from typing import List, Optional
 from loguru import logger
 
+from life_recorder.life_recorder import LifeRecorder
+from life_recorder.create import CreateLifeRecorder
 from life_recorder.read import ReadLifeRecorder
-from life_recorder.add import AddLifeRecorder
 from life_recorder.update import UpdateLifeRecorder
 from life_recorder.delete import DeleteLifeRecorder
 
 
-def life_factory(action: str):
+def action_factory(action: str) -> Optional[LifeRecorder]:
     """Factory that decides which action to perform."""
 
-    if action == "add":
-        return AddLifeRecorder
+    if action == "create":
+        return CreateLifeRecorder
     elif action == "read":
         return ReadLifeRecorder
     elif action == "update":
@@ -22,7 +24,9 @@ def life_factory(action: str):
         return DeleteLifeRecorder
     else:
         print(
-            f'Unfortunately we don\'t have such an action. \nTried action was "{action}"\nWe support these actions: add, read, read <id>, update, delete.')
+            f'Unfortunately we don\'t have such an action. \nTried action was "{action}"\nWe support these actions: create, read, read <id>, update, delete.'
+        )
+        return None
 
 
 @logger.catch
@@ -35,7 +39,7 @@ def main(args: List[str]) -> None:
     except IndexError:
         identifier = None
 
-    action = life_factory(action_arg)
+    action = action_factory(action_arg)
 
     try:
         action().act(identifier)
@@ -46,5 +50,4 @@ def main(args: List[str]) -> None:
 if __name__ == '__main__':
     # get action arg from command line
     arguments = sys.argv
-    # arguments = ["", "read", "8"]
     main(arguments)
