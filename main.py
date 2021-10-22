@@ -1,7 +1,7 @@
 """Module is used to run LifeRecorder class and record some memories."""
 
 import sys
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 from loguru import logger
 
 from life_recorder.life_recorder import LifeRecorder
@@ -11,17 +11,20 @@ from life_recorder.update import UpdateLifeRecorder
 from life_recorder.delete import DeleteLifeRecorder
 
 
-def action_factory(command: str) -> LifeRecorder:
+def action_factory(command: str) -> Optional[LifeRecorder]:
     """Factory that decides which action to perform based on the command."""
 
+    fac = None
     if command == "create":
-        return CreateLifeRecorder
+        fac = CreateLifeRecorder
     elif command == "read":
-        return ReadLifeRecorder
+        fac = ReadLifeRecorder
     elif command == "update":
-        return UpdateLifeRecorder
+        fac = UpdateLifeRecorder
     elif command == "delete":
-        return DeleteLifeRecorder
+        fac = DeleteLifeRecorder
+
+    return fac
 
 
 def check_arguments(args: List[str]) -> Tuple[bool]:
