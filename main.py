@@ -63,7 +63,7 @@ def check_identifier(args: List[str]) -> bool:
         command = args[0]
 
         print('Error: Identifier is not a number')
-        print('Usage: You need to provide an identifier for the command '
+        print('Usage: You need to provide a number as an identifier for the command '
               f'to perform. For example, "{command} 3"')
         return False
 
