@@ -64,7 +64,6 @@ def main(args: List[str]) -> None:
 if __name__ == '__main__':
     # get action arg from command line
     arguments = sys.argv[1:]
-    # arguments = ["update"]
     if len(arguments) < 1:
         print('Error: You haven\'t provided any arguments for program to perform '
               'action.')
