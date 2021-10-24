@@ -3,8 +3,8 @@
 import sys
 from typing import Dict
 
-from .life_recorder import LifeRecorder
-from . import helper
+from life_recorder import helper
+from .base import LifeRecorder
 
 
 class ReadLifeRecorder(LifeRecorder):

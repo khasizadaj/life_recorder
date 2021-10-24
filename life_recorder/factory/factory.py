@@ -1,11 +1,11 @@
 """Module contains creation part of factory pattern."""
 
 # factories
-from life_recorder.life_recorder import LifeRecorder
-from life_recorder.create import CreateLifeRecorder
-from life_recorder.read import ReadLifeRecorder
-from life_recorder.update import UpdateLifeRecorder
-from life_recorder.delete import DeleteLifeRecorder
+from .base import LifeRecorder
+from .create import CreateLifeRecorder
+from .read import ReadLifeRecorder
+from .update import UpdateLifeRecorder
+from .delete import DeleteLifeRecorder
 
 
 def action_factory(command: str) -> LifeRecorder:

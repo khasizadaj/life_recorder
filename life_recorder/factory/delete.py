@@ -3,17 +3,20 @@
 import sys
 from typing import Dict
 
-from .import life_recorder, helper
+from life_recorder import helper
+from .base import LifeRecorder
 
 
-class DeleteLifeRecorder(life_recorder.LifeRecorder):
+class DeleteLifeRecorder(LifeRecorder):
     """Implements adding life records to the database."""
 
     def act(self, identifier: int = None) -> None:
         """Add a new life record to database."""
 
         if identifier is None:
-            print("In order to delete any record, you need to specify an identifier.")
+            print(
+                "In order to delete any record, you need to specify an identifier."
+            )
             print()
             sys.exit()
 

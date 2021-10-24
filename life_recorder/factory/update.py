@@ -3,10 +3,11 @@
 import sys
 from typing import Tuple, Dict
 
-from . import life_recorder, helper
+from life_recorder import helper
+from .base import LifeRecorder
 
 
-class UpdateLifeRecorder(life_recorder.LifeRecorder):
+class UpdateLifeRecorder(LifeRecorder):
     """Implements adding life records to the database."""
 
     def act(self, identifier: int = None) -> None:

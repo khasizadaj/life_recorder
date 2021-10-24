@@ -5,7 +5,7 @@ from typing import List, Tuple
 from loguru import logger
 
 import life_recorder.check as ch
-import life_recorder.factory as fac
+import life_recorder.factory.factory as fac
 
 
 def get_arguments(args: List[str]) -> Tuple[bool]:
