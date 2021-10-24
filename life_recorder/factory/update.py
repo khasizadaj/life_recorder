@@ -10,6 +10,12 @@ from .base import LifeRecorder
 class UpdateLifeRecorder(LifeRecorder):
     """Implements adding life records to the database."""
 
+    def __init__(self):
+        super().__init__()
+        self.input_messages["tag"] = "What is the updated tag? (optional): "
+        self.input_messages["title"] = "What is the updated title?: "
+        self.input_messages["content"] = "What is the updated content?: "
+
     def act(self, identifier: int = None) -> None:
         """Add a new life record to database."""
 
@@ -32,11 +38,11 @@ class UpdateLifeRecorder(LifeRecorder):
         print('Usage: Add new detail for respective field. If you want to keep '
               'any value untouched, press "Enter".')
 
-        tag, content = self.compare_new_details(
+        tag, title, content = self.compare_new_details(
             old_record, *self.get_record_details())
 
         record = h.construct_record_dict(old_record["id"], old_record["timestamp"],
-                                         tag, content)
+                                         tag, title, content)
 
         updated_database = h.update_database(self.database, record)
         self.save_records(updated_database)
@@ -45,7 +51,7 @@ class UpdateLifeRecorder(LifeRecorder):
         h.add_breakline(print, func_args=[message], after=True)
 
     @staticmethod
-    def compare_new_details(old_record: Dict, tag: str, content: str):
+    def compare_new_details(old_record: Dict, tag: str, title: str, content: str):
         """
         Check if provided tag and content are really new ones. 
         If empty value is provide, it means that user doesn't wanna change it.
@@ -54,10 +60,13 @@ class UpdateLifeRecorder(LifeRecorder):
         if tag == "":
             tag = old_record['tag']
 
+        if title == "":
+            title = old_record['title']
+
         if content == "":
             content = old_record['content']
 
-        return tag, content
+        return tag, title, content
 
     def get_record_details(self) -> Tuple:
         """Function gets and returns inputs from user."""
@@ -66,15 +75,16 @@ class UpdateLifeRecorder(LifeRecorder):
         input_message = self.get_input_message("tag")
         tag = input(input_message)
 
+        input_message = self.get_input_message("title")
+        title = input(input_message)
+
         # ask for content of record
         input_message = self.get_input_message("content")
         content = input(input_message)
 
         # return user inputs
-        return tag, content
+        return tag, title, content
 
 
 if __name__ == "__main__":
     print(__doc__)
-    life = UpdateLifeRecorder()
-    life.act(3)
