@@ -18,31 +18,26 @@ def get_arguments(args: List[str]) -> Tuple[bool]:
         sys.exit()
 
     # `None` is defualt value for variable, which means that identifier is not
-    # required for this command. if it's required but not provided, respective
-    # message will be printed.
+    # required for this command. if it's required but not provided or provided
+    # incorrectly, respective message will be printed.
     identifier = None
 
-    requires_identifier: int = ch.check_requires_identifier(command)
-    if requires_identifier in [1, 2]:
-        identifier_status = ch.check_identifier(args)
+    requires_identifier: bool = ch.check_requires_identifier(command)
+    if requires_identifier:
+        identifier_status = ch.get_identifier_status(args)
+        status_function = ch.STATUS_FUNCS.get(identifier_status, None)
+        if status_function is not None:
 
-        func = ch.IDENTIFIER_CHECK_STATUSES.get(identifier_status, None)
-        if func is not None:
-            if identifier_status == 1 and requires_identifier == 2:
+            # status of 1 means that the identifier is not provided for the
+            # command. As `read` can perform action with or without the identifier,
+            # this check omots that specific type of error.
+            if identifier_status == 1 and command == 'read':
                 pass
             else:
-                func(command)
-
-        if identifier_status != 0:
-            if identifier_status == 1 and requires_identifier == 2:
-                pass
-            else:
+                status_function(command)
                 sys.exit()
-
-        try:
+        else:
             identifier = args[1]
-        except IndexError:
-            pass
 
     return command, identifier
 
