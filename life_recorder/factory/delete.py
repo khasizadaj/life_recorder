@@ -19,6 +19,11 @@ class DeleteLifeRecorder(LifeRecorder):
             sys.exit()
 
         old_record = h.get_record(self.records, str(identifier))
+        if old_record is None:
+            message = "There is no record with the given identifier."
+            h.add_breakline(print, func_args=[message], both=True)
+            sys.exit()
+
         self.print_old_record(old_record)
 
         decision = self.get_decision()
