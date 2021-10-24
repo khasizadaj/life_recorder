@@ -3,7 +3,7 @@
 import sys
 from typing import Dict
 
-from life_recorder import helper
+from life_recorder import helper as h
 from .base import LifeRecorder
 
 
@@ -14,33 +14,36 @@ class DeleteLifeRecorder(LifeRecorder):
         """Add a new life record to database."""
 
         if identifier is None:
-            print(
-                "In order to delete any record, you need to specify an identifier."
-            )
-            print()
+            message = "In order to delete any record, you need to specify an identifier."
+            h.add_breakline(print, func_args=[message], both=True)
             sys.exit()
 
-        old_record = helper.get_record(self.records, str(identifier))
+        old_record = h.get_record(self.records, str(identifier))
         self.print_old_record(old_record)
 
         decision = self.get_decision()
         if decision:
-            print("Deleting record ... Don't stop adding new records!")
+            message = "Deleting record ... Don't stop adding new records!"
+            h.add_breakline(print, func_args=[message], before=True)
 
-            updated_database = helper.delete_record(self.database, identifier)
+            updated_database = h.delete_record(self.database, identifier)
             self.save_records(updated_database)
 
-            print("Successfully deleted record.")
+            message = "Successfully deleted record."
+            h.add_breakline(print, func_args=[message], after=True)
         else:
-            print("Every record matters! I am glad that you didn't delete it!")
+            message = "Every record matters! I am glad that you didn't delete it!"
+            h.add_breakline(print, func_args=[message], both=True)
             return
 
     def print_old_record(self, old_record: Dict) -> None:
         """Prints the old record for user."""
 
-        print("Record you want to delete is:")
-        helper.print_pretty_record(old_record)
-        print("")
+        message = "Record you want to delete is:"
+        h.add_breakline(print, func_args=[message], before=True)
+
+        h.add_breakline(h.print_pretty_record,
+                        func_args=[old_record], after=True)
 
     def get_decision(self) -> bool:
         """Returns the decision of user about deletion of record."""

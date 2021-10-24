@@ -1,7 +1,7 @@
 """Module contains helper functions for LifeRecorder class."""
 
 from datetime import datetime
-from typing import Dict
+from typing import Dict, List
 
 
 def get_timestamp() -> str:
@@ -42,6 +42,23 @@ def get_record(records: Dict, identifier: str) -> Dict:
     """Returns dictionary of single record that matches given identifier."""
 
     return records.get(identifier, None)
+
+
+def add_breakline(func, func_args: List, before: bool = False,
+                  after: bool = False, both: bool = False) -> None:
+    """Function adding breaklines depending on arguments provided."""
+
+    if before:
+        print()
+        func(*func_args)
+
+    elif after:
+        func(*func_args)
+        print()
+    elif both:
+        print()
+        func(*func_args)
+        print()
 
 
 def print_pretty_record(record: str) -> None:

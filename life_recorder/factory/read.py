@@ -3,7 +3,7 @@
 import sys
 from typing import Dict
 
-from life_recorder import helper
+from life_recorder import helper as h
 from .base import LifeRecorder
 
 
@@ -17,19 +17,19 @@ class ReadLifeRecorder(LifeRecorder):
         """
 
         if identifier is not None:
-            record = helper.get_record(self.records, identifier)
+            record = h.get_record(self.records, identifier)
             if record is None:
-                print("Provided identifier didn't match with any record.")
-                print()
+                message = "Provided identifier didn't match with any record."
+                h.add_breakline(print, func_args=[message], both=True)
                 sys.exit()
 
-            helper.print_pretty_record(record)
-            print()
+            h.add_breakline(h.print_pretty_record,
+                            func_args=[record], after=True)
             return
 
         for record in self.get_all_records():
-            helper.print_pretty_record(record)
-            print()
+            h.add_breakline(h.print_pretty_record,
+                            func_args=[record], after=True)
 
     def get_all_records(self) -> Dict:
         """Function return all records from the database."""

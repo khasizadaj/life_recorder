@@ -3,7 +3,7 @@
 import sys
 from typing import Tuple, Dict
 
-from life_recorder import helper
+from life_recorder import helper as h
 from .base import LifeRecorder
 
 
@@ -14,35 +14,38 @@ class UpdateLifeRecorder(LifeRecorder):
         """Add a new life record to database."""
 
         if identifier is None:
-            print("In order to update any record, you need to specify an identifier.")
-            print()
+            message = "In order to update any record, you need to specify an identifier."
+            h.add_breakline(print, func_args=[message], both=True)
             sys.exit()
 
-        old_record = helper.get_record(self.records, str(identifier))
+        old_record = h.get_record(self.records, str(identifier))
 
         if old_record is None:
-            print("Provided identifier didn't match with any record.")
-            print()
+            message = "Provided identifier didn't match with any record."
+            h.add_breakline(print, func_args=[message], after=True)
             sys.exit()
 
-        print(
-            f"Current record: #{old_record['id']}: {old_record['tag']} - {old_record['content']}"
-        )
-        print('If you want to keep any value untouched, press "Enter".')
+        print("Current record:")
+        h.add_breakline(h.print_pretty_record, func_args=[
+                        old_record], after=True)
 
-        tag, content = self.check_new_tag_and_content(
+        print('Usage: Add new detail for respective field. If you want to keep '
+              'any value untouched, press "Enter".')
+
+        tag, content = self.compare_new_details(
             old_record, *self.get_record_details())
 
-        record = helper.construct_record_dict(old_record["id"], old_record["timestamp"],
-                                              tag, content)
+        record = h.construct_record_dict(old_record["id"], old_record["timestamp"],
+                                         tag, content)
 
-        updated_database = helper.update_database(self.database, record)
+        updated_database = h.update_database(self.database, record)
         self.save_records(updated_database)
 
-        print(
-            f"Updated life record: #{record['id']}: {record['tag']} - {record['content']}")
+        message = f"Record with #{record['id']} is updated."
+        h.add_breakline(print, func_args=[message], after=True)
 
-    def check_new_tag_and_content(self, old_record: Dict, tag: str, content: str):
+    @staticmethod
+    def compare_new_details(old_record: Dict, tag: str, content: str):
         """
         Check if provided tag and content are really new ones. 
         If empty value is provide, it means that user doesn't wanna change it.

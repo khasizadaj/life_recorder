@@ -28,9 +28,8 @@ class CreateLifeRecorder(LifeRecorder):
         updated_database = helper.update_database(self.database, record)
         self.save_records(updated_database)
 
-        print(
-            f"Added life record: #{record['id']}: {record['tag']} - {record['content']}"
-        )
+        helper.add_breakline(helper.print_pretty_record,
+                             func_args=[record], both=True)
 
     def get_user_inputs(self) -> Tuple:
         """Return user inputs to create a record. these inputs are tag and content."""
@@ -38,10 +37,14 @@ class CreateLifeRecorder(LifeRecorder):
         # ask for tag of record
         input_message = self.get_input_message("tag")
         tag = input(input_message)
+        while tag == "":
+            tag = input("Please enter a tag; it can't be blank: ")
 
         # ask for content of record
         input_message = self.get_input_message("content")
         content = input(input_message)
+        while content == "":
+            content = input("Please enter a content; it can't be blank: ")
 
         return tag, content
 
