@@ -12,7 +12,7 @@ class LifeRecorder:
     _file_name = "life_records.json"
     input_messages = {
         "tag": "What is the tag of this record?: ",
-        "content": "What do you want to remember? ",
+        "content": "What is the content of this record?: ",
         "read": "How many rows do you want to read?",
         "action": "What do you want to do, read (r) or write (w)? ",
         "delete": "Are you sure you want to delete this record? [Y(y) / N(n)] "
