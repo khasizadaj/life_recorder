@@ -1,53 +1,72 @@
 """Module is used to run LifeRecorder class and record some memories."""
 
 import sys
-from typing import List, Optional
+from typing import List, Tuple
 from loguru import logger
 
-from life_recorder.life_recorder import LifeRecorder
-from life_recorder.create import CreateLifeRecorder
-from life_recorder.read import ReadLifeRecorder
-from life_recorder.update import UpdateLifeRecorder
-from life_recorder.delete import DeleteLifeRecorder
+import life_recorder.check as ch
+import life_recorder.factory.factory as fac
 
 
-def action_factory(action: str) -> Optional[LifeRecorder]:
-    """Factory that decides which action to perform."""
+def get_arguments(args: List[str]) -> Tuple[bool]:
+    """Function checks whether arguments are valid."""
 
-    if action == "create":
-        return CreateLifeRecorder
-    elif action == "read":
-        return ReadLifeRecorder
-    elif action == "update":
-        return UpdateLifeRecorder
-    elif action == "delete":
-        return DeleteLifeRecorder
-    else:
-        print(
-            f'Unfortunately we don\'t have such an action. \nTried action was "{action}"\nWe support these actions: create, read, read <id>, update, delete.'
-        )
-        return None
+    command = args[0]
+    is_command = ch.check_command(command)
+
+    if not is_command:
+        sys.exit()
+
+    # `None` is defualt value for variable, which means that identifier is not
+    # required for this command. if it's required but not provided or provided
+    # incorrectly, respective message will be printed.
+    identifier = None
+
+    requires_identifier: bool = ch.check_requires_identifier(command)
+    if requires_identifier:
+        identifier_status = ch.get_identifier_status(args)
+        status_function = ch.STATUS_FUNCS.get(identifier_status, None)
+        if status_function is not None:
+
+            # status of 1 means that the identifier is not provided for the
+            # command. As `read` can perform action with or without the identifier,
+            # this check omots that specific type of error.
+            if identifier_status == 1 and command == 'read':
+                pass
+            else:
+                status_function(command)
+                sys.exit()
+        else:
+            identifier = args[1]
+
+    return command, identifier
 
 
 @logger.catch
 def main(args: List[str]) -> None:
     """Functions gets the record and writes it to the file."""
 
-    action_arg = args[1]
-    try:
-        identifier = args[2]
-    except IndexError:
-        identifier = None
+    # get arguments
+    command, identifier = get_arguments(args)
 
-    action = action_factory(action_arg)
+    # get factory
+    action = fac.action_factory(command)
 
-    try:
-        action().act(identifier)
-    except TypeError:
-        sys.exit()
+    # perform the action
+    action().act(identifier)
 
 
 if __name__ == '__main__':
     # get action arg from command line
-    arguments = sys.argv
+    arguments = sys.argv[1:]
+    if len(arguments) < 1:
+        print('Error: You haven\'t provided any arguments for program to perform '
+              'action.')
+        print('Usage: Add commands to use this program. Supported commands: '
+              'create, read, read <identifier>, update <identifier>, '
+              'delete <identifier>')
+
+        sys.exit()
+
     main(arguments)
+    sys.exit()

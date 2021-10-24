@@ -1,7 +1,7 @@
 """Module contains helper functions for LifeRecorder class."""
 
 from datetime import datetime
-from typing import Dict
+from typing import Dict, List
 
 
 def get_timestamp() -> str:
@@ -19,13 +19,15 @@ def update_database(database: Dict, record: Dict) -> Dict:
     return cp_database
 
 
-def construct_record_dict(identifier: str, timestamp: str, tag: str, content: str) -> Dict:
+def construct_record_dict(identifier: str, timestamp: str, tag: str, title: str,
+                          content: str) -> Dict:
     """Returns dictionary of record."""
 
     return {
         "id": identifier,
         "timestamp": timestamp,
         "tag": tag,
+        "title": title,
         "content": content
     }
 
@@ -44,9 +46,30 @@ def get_record(records: Dict, identifier: str) -> Dict:
     return records.get(identifier, None)
 
 
+def add_breakline(func, func_args: List, before: bool = False,
+                  after: bool = False, both: bool = False) -> None:
+    """Function adding breaklines depending on arguments provided."""
+
+    if before:
+        print()
+        func(*func_args)
+
+    elif after:
+        func(*func_args)
+        print()
+    elif both:
+        print()
+        func(*func_args)
+        print()
+
+
 def print_pretty_record(record: str) -> None:
     """Prints a record with provided identifier (id)."""
 
     print(
-        f"Id: #{record['id']} \nTimestamp: {record['timestamp']} \nTag: {record['tag']} \nContent: {record['content']}"
+        f"Id: #{record['id']} \n"
+        f"Timestamp: {record['timestamp']} \n"
+        f"Tag: {record['tag']} \n"
+        f"Title: {record['title']} \n"
+        f"Content: {record['content']}"
     )

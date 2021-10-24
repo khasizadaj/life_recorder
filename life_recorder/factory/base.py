@@ -10,16 +10,10 @@ class LifeRecorder:
     """Class that implements writing and reading of life records."""
 
     _file_name = "life_records.json"
-    input_messages = {
-        "tag": "What is the tag of this record?: ",
-        "content": "What do you want to remember? ",
-        "read": "How many rows do you want to read?",
-        "action": "What do you want to do, read (r) or write (w)? ",
-        "delete": "Are you sure you want to delete this record? [Y(y) / N(n)] "
-    }
 
     def __init__(self):
         self._database = self.load_database()
+        self.input_messages = {}
 
     def act(self, identifier: str = None):
         """This method implements main purpose of current class."""
