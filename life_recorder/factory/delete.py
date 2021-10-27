@@ -10,6 +10,11 @@ from .base import LifeRecorder
 class DeleteLifeRecorder(LifeRecorder):
     """Implements adding life records to the database."""
 
+    def __init__(self):
+        super().__init__()
+        self.input_messages[
+            "delete"] = "Are you sure you want to delete this record? [Y(y) / N(n)]: "
+
     def act(self, identifier: int = None) -> None:
         """Add a new life record to database."""
 

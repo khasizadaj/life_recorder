@@ -19,13 +19,15 @@ def update_database(database: Dict, record: Dict) -> Dict:
     return cp_database
 
 
-def construct_record_dict(identifier: str, timestamp: str, tag: str, content: str) -> Dict:
+def construct_record_dict(identifier: str, timestamp: str, tag: str, title: str,
+                          content: str) -> Dict:
     """Returns dictionary of record."""
 
     return {
         "id": identifier,
         "timestamp": timestamp,
         "tag": tag,
+        "title": title,
         "content": content
     }
 
@@ -65,5 +67,9 @@ def print_pretty_record(record: str) -> None:
     """Prints a record with provided identifier (id)."""
 
     print(
-        f"Id: #{record['id']} \nTimestamp: {record['timestamp']} \nTag: {record['tag']} \nContent: {record['content']}"
+        f"Id: #{record['id']} \n"
+        f"Timestamp: {record['timestamp']} \n"
+        f"Tag: {record['tag']} \n"
+        f"Title: {record['title']} \n"
+        f"Content: {record['content']}"
     )
