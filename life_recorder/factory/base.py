@@ -4,16 +4,17 @@ This module contains LifeRecorder class which is used to work with records.
 
 
 import json
+from dataclasses import dataclass
 
 
+@dataclass(frozen=True)
 class Commands():
     """Class contains commands an strings which can be used to perform this command."""
 
-    def __init__(self):
-        self.create = ["create", "c", "C"]
-        self.read = ["read", "r", "R"]
-        self.update = ["update", "u", "U"]
-        self.delete = ["delete", "d", "D"]
+    create = ["create", "c", "C"]
+    read = ["read", "r", "R"]
+    update = ["update", "u", "U"]
+    delete = ["delete", "d", "D"]
 
     def get_type(self, command):
         """
@@ -23,8 +24,8 @@ class Commands():
         0: requires no identifier
         1: requires identifier
         2: identifier is optional or it's hybrid
-
         """
+
         if command in self._no_identifier_commands:
             status = 0
         elif command in self._only_with_identifier:
@@ -36,18 +37,31 @@ class Commands():
 
     @property
     def _no_identifier_commands(self):
+        """This method returns list of commands that require `no identifier`."""
+
         return [*self.create]
 
     @property
     def _only_with_identifier(self):
+        """
+        This method returns list of commands that `always requires identifier`.
+        """
+
         return [*self.update, *self.delete]
 
     @property
     def _hybrid_commands(self):
+        """
+        This method returns list of commands that are `hybrid`, i.e., may and
+        may not require identifier. It depedns on the usecase.
+        """
+
         return [*self.read]
 
     @property
     def all_commands(self):
+        """Method returns a list of all possible commands."""
+
         return [*self.create, *self.read, *self.update, *self.delete]
 
 
