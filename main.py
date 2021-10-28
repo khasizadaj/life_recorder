@@ -6,6 +6,7 @@ from loguru import logger
 
 import life_recorder.check as ch
 import life_recorder.factory.factory as fac
+from life_recorder.factory.base import COMMANDS
 
 
 def get_arguments(args: List[str]) -> Tuple[bool]:
@@ -31,7 +32,7 @@ def get_arguments(args: List[str]) -> Tuple[bool]:
             # status of 1 means that the identifier is not provided for the
             # command. As `read` can perform action with or without the identifier,
             # this check omots that specific type of error.
-            if identifier_status == 1 and command == 'read':
+            if identifier_status == 1 and command in COMMANDS.read:
                 pass
             else:
                 status_function(command)
