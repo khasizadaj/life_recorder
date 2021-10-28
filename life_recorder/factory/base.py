@@ -5,6 +5,9 @@ This module contains LifeRecorder class which is used to work with records.
 
 import json
 from dataclasses import dataclass
+import os
+
+PARENT_DIR = f"C:\\\\Users\\{os.getenv('username')}"
 
 
 @dataclass(frozen=True)
@@ -104,7 +107,7 @@ class LifeRecorder:
         """This property return a dictionary of records."""
 
         try:
-            with open(self._file_name, "r") as file:
+            with open(self.path_to_file, "r") as file:
                 return json.load(file)
         except FileNotFoundError:
             return self.get_empty_database()
@@ -120,8 +123,30 @@ class LifeRecorder:
     def save_records(self, records: str) -> None:
         """Writes life log to file."""
 
-        with open(self.file_name, "w") as output:
+        with open(self.path_to_file, "w") as output:
             json.dump(records, output)
+
+    @property
+    def path_to_file(self) -> str:
+        """Property method that returns the path to the file."""
+
+        return self.get_path_to_file()
+
+    def get_path_to_file(self):
+        """
+        Method returns the path to the file. 
+        If there is `.data` directory,it will make new one and return it.
+        """
+
+        data_dir = f"{PARENT_DIR}\\.data"
+        is_dir = os.path.isdir(data_dir)
+        if is_dir:
+            pass
+        else:
+            os.mkdir(data_dir)
+
+        data_dir = f"{data_dir}\\{self.file_name}"
+        return data_dir
 
     @staticmethod
     def get_empty_database():
