@@ -1,8 +1,7 @@
 """Module contains functions to check arguments provided for program."""
 
 from typing import List
-
-COMMANDS_ALL = {0: ["create"], 1: ["update", "delete"], 2: ["read"]}
+from .factory.base import COMMANDS
 
 
 def get_identifier_status(args: List[str]) -> bool:
@@ -17,30 +16,10 @@ def get_identifier_status(args: List[str]) -> bool:
     return 0
 
 
-def get_command_type(command):
-    """
-    Function returns the command type, i.e. number that represents identifier
-    requirement of a command.
-    """
-
-    comms_no_identifier = COMMANDS_ALL[0]
-    comms_only_with_identifier = COMMANDS_ALL[1]
-    comms_hybrid = COMMANDS_ALL[2]
-
-    if command in comms_no_identifier:
-        status = 0
-    elif command in comms_only_with_identifier:
-        status = 1
-    elif command in comms_hybrid:
-        status = 2
-
-    return status
-
-
 def check_requires_identifier(command: str) -> int:
     """Function checks whether command is required to have an identifier."""
 
-    command_type = get_command_type(command)
+    command_type = COMMANDS.get_type(command)
 
     if command_type == 0:
         return False
@@ -51,12 +30,9 @@ def check_requires_identifier(command: str) -> int:
 def check_command(command) -> bool:
     """Check if the command is valid."""
 
-    commands = [comm for comm_list in COMMANDS_ALL.values()
-                for comm in comm_list]
-
-    if command not in commands:
+    if command not in COMMANDS.all_commands:
         print('Error: Unknown command. Unfortunately we don\'t have such command.')
-        print('Usage: You can utilize these commands: create, read, update, '
+        print('Usage: You can utilize these COMMANDS: create, read, update, '
               'delete.')
         print(f'Info: You tried this command: "{command}".')
         return False

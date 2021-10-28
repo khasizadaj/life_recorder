@@ -6,6 +6,54 @@ This module contains LifeRecorder class which is used to work with records.
 import json
 
 
+class Commands():
+    """Class contains commands an strings which can be used to perform this command."""
+
+    def __init__(self):
+        self.create = ["create", "c", "C"]
+        self.read = ["read", "r", "R"]
+        self.update = ["update", "u", "U"]
+        self.delete = ["delete", "d", "D"]
+
+    def get_type(self, command):
+        """
+        Method returns the command type, i.e. number that represents identifier
+        requirement of a command.
+
+        0: requires no identifier
+        1: requires identifier
+        2: identifier is optional or it's hybrid
+
+        """
+        if command in self._no_identifier_commands:
+            status = 0
+        elif command in self._only_with_identifier:
+            status = 1
+        elif command in self._hybrid_commands:
+            status = 2
+
+        return status
+
+    @property
+    def _no_identifier_commands(self):
+        return [*self.create]
+
+    @property
+    def _only_with_identifier(self):
+        return [*self.update, *self.delete]
+
+    @property
+    def _hybrid_commands(self):
+        return [*self.read]
+
+    @property
+    def all_commands(self):
+        return [*self.create, *self.read, *self.update, *self.delete]
+
+
+COMMANDS = Commands()
+
+
 class LifeRecorder:
     """Class that implements writing and reading of life records."""
 
