@@ -128,15 +128,22 @@ class LifeRecorder:
 
     @property
     def path_to_file(self) -> str:
+        """Property method that returns the path to the file."""
+
         return self.get_path_to_file()
 
     def get_path_to_file(self):
+        """
+        Method returns the path to the file. 
+        If there is `.data` directory,it will make new one and return it.
+        """
+
         data_dir = f"{PARENT_DIR}\\.data"
         is_dir = os.path.isdir(data_dir)
         if is_dir:
             pass
         else:
-            os.makedirs(data_dir)
+            os.mkdir(data_dir)
 
         data_dir = f"{data_dir}\\{self.file_name}"
         return data_dir
