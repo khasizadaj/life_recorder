@@ -18,11 +18,11 @@ $ life_recorder <command> <identifier>
 
 ### Commands
 
-- create
-- read
-- read <identifier>
-- update <identifier>
-- delete <identifier>
+- `create`
+- `read`
+- `read <identifier>`
+- `update <identifier>`
+- `delete <identifier>`
 
 #### create
 
