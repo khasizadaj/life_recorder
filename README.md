@@ -6,11 +6,23 @@ A CLI based approach to save records. Records can be categorized with tags.
 
 [TOC]
 
+> DISCLAIMER: This assumes that you have Python 3.8 or above is installed.
+
+## Installation
+
+```bash
+git clone https://github.com/khasizadaj/life_recorder.git
+
+cd life_recorder
+
+pip install .
+```
+
 ## Usage
 
 ```shell
 # run as python script
-$ py .\main.py <command> <identifier>
+$ life_recorder <command> <identifier>
 
 # run as an .exe file
 $ life_recorder <command> <identifier>
@@ -35,7 +47,7 @@ User needs to provide these inputs to create new record:
 - `<content>`
 
 ```shell
-$ py .\main.py create
+$ life_recorder create
 
   # user inputs
   What is the tag of record (optional)?: <tag>
@@ -59,7 +71,7 @@ $ py .\main.py create
 This command can be used with or without providing an identifier. If it is without any identifier, it will read and print all existing records in the database.
 
 ```shell
-$ py .\main.py read
+$ life_recorder read
 
   # output
   id: <identifier>
@@ -81,7 +93,7 @@ $ py .\main.py read
 However, if user provides an identifier for command, it will read and print record that has specified identifier in the database.
 
 ```shell
-$ py .\main.py read <correct_identifier>
+$ life_recorder read <correct_identifier>
 
   # output
   id: <correct_identifier>
@@ -97,7 +109,7 @@ $ py .\main.py read <correct_identifier>
 This command always requires an identifier to perform the operation. It takes an identifier and prints record for user to remind what was the record; then asks to update any fields that can be updated, i.e. title, tag, content.
 
 ```shell
-$ py .\main.py update <identifier>
+$ life_recorder update <identifier>
 
   # reminder
   Current record:
@@ -127,7 +139,7 @@ $ py .\main.py update <identifier>
 This command always requires an identifier to perform the operation. It takes an identifier and prints record for user to remind what is the record; then it asks the user to confirm deletion of record. If user confirms, it will delete it.
 
 ```shell
-$ py .\main.py update <identifier>
+$ life_recorder update <identifier>
 
   Record you want to delete is:
   id: <identifier>

@@ -1,0 +1,41 @@
+[project]
+name = "life-recorder"
+version = "0.1.0"
+description = "A simple CLI tool for recording life events"
+readme = "README.md"
+authors = [
+    { name = "Javid Khasizada", email = "willow.tiger8627@eagereverest.com" },
+]
+license = { text = "MIT" }
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: End Users/Desktop - Regular computer users",
+    "Operating System :: OS Independent",
+    "Environment :: Console",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+requires-python = ">=3.8,<4.0"
+dependencies = ["loguru>=0.7.3"]
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.12.7"
+
+[project.scripts]
+life_recorder = "life_recorder.cli:main"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "src"
