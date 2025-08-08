@@ -1,7 +1,7 @@
 """Module is used to run LifeRecorder class and record some memories."""
 
 import sys
-from typing import List, Tuple
+from typing import Union
 from loguru import logger
 import click
 
@@ -9,23 +9,65 @@ import life_recorder.check as ch
 import life_recorder.factory.factory as fac
 
 
-@click.command("main")
-@click.argument(
-    "command", type=click.Choice(["create", "read", "update", "delete"])
-)
-@click.argument("identifier", required=False, type=click.STRING)
+@click.group()
 @click.version_option(version="0.1.0", prog_name="life_recorder")
 @logger.catch
-def main(command: str, identifier: str) -> None:
+def main() -> None:
     """
     Utility to record life events.
     """
+    pass
 
-    click.echo(f"Command: {command}")
-    click.echo(f"Identifier: {identifier}")
 
-    action = fac.action_factory(command)
-    action.act(identifier)
+@main.command()
+@logger.catch
+def create() -> None:
+    """Creates the new record."""
+
+    action = fac.action_factory("create")
+    action.act()
+    sys.exit()
+
+
+@main.command()
+@click.argument("identifier", required=False, type=click.STRING)
+@logger.catch
+def read(identifier: Union[str, None]) -> None:
+    """
+    Reads the record.
+
+    IDENTIFIER is id of the record. If not provided, it will read all records.
+    """
+    action = fac.action_factory("read")
+    action.act(identifier=identifier)
+    sys.exit()
+
+
+@main.command()
+@click.argument("identifier", required=True, type=click.STRING)
+@logger.catch
+def update(identifier: Union[str, None]) -> None:
+    """
+    Updates the record.
+
+    IDENTIFIER is id of the record.
+    """
+    action = fac.action_factory("update")
+    action.act(identifier=identifier)
+    sys.exit()
+
+
+@main.command()
+@click.argument("identifier", required=True, type=click.STRING)
+@logger.catch
+def delete(identifier: Union[str, None]) -> None:
+    """
+    Deletes the record.
+
+    IDENTIFIER is id of the record.
+    """
+    action = fac.action_factory("delete")
+    action.act(identifier=identifier)
     sys.exit()
 
 
