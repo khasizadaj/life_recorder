@@ -8,6 +8,7 @@ from dataclasses import dataclass
 import os
 
 from abc import ABC, abstractmethod
+from typing import Union
 
 PARENT_DIR = f"C:\\\\Users\\{os.getenv('username')}"
 
@@ -83,7 +84,7 @@ class LifeRecorder(ABC):
         self.input_messages = {}
 
     @abstractmethod
-    def act(self, identifier: str = None):
+    def act(self, identifier: Union[str, None] = None):
         """This method implements main purpose of current class."""
 
         pass

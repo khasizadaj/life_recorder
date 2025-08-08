@@ -1,7 +1,7 @@
 """Module contains class that reads record(s) from the database."""
 
 import sys
-from typing import Dict
+from typing import Dict, Union
 
 from life_recorder import helper as h
 from .base import LifeRecorder
@@ -10,7 +10,7 @@ from .base import LifeRecorder
 class ReadLifeRecorder(LifeRecorder):
     """Implements reading life records from the database."""
 
-    def act(self, identifier: int = None) -> None:
+    def act(self, identifier: Union[str, None] = None):
         """
         Function reads records from the database. 
         If identifier is specified, it will return only one record.
