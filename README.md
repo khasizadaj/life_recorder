@@ -160,6 +160,15 @@ $ life_recorder update <identifier>
 
 ```
 
+### Development
+
+To run tests, run the following command:
+
+```bash
+$ poetry install --with dev
+$ poetry run python -m unittest discover -v -s tests -p 'test_*.py' --failfast
+```
+
 ### using .exe file
 
 **TBA**
