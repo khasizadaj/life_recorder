@@ -1,7 +1,7 @@
 """Module contains class that adds new records to the database."""
 
 import sys
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Union
 
 from life_recorder import helper as h
 from .base import LifeRecorder
@@ -16,7 +16,7 @@ class CreateLifeRecorder(LifeRecorder):
         self.input_messages["title"] = "What is the title of this record?: "
         self.input_messages["content"] = "What is the content of this record?: "
 
-    def act(self, identifier: str = None) -> None:
+    def act(self, identifier: Union[str, None] = None):
         """Add a new life record to database."""
 
         if identifier is not None:

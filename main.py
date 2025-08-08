@@ -1,7 +1,7 @@
 """Module is used to run LifeRecorder class and record some memories."""
 
 import sys
-from typing import List, Tuple
+from typing import List, Tuple, Union
 from loguru import logger
 
 import life_recorder.check as ch
@@ -9,7 +9,7 @@ import life_recorder.factory.factory as fac
 from life_recorder.factory.base import COMMANDS
 
 
-def get_arguments(args: List[str]) -> Tuple[bool]:
+def get_arguments(args: List[str]) -> Tuple[str, Union[str, None]]:
     """Function checks whether arguments are valid."""
 
     command = args[0]

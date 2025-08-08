@@ -1,7 +1,7 @@
 """Module contains class that deletes records from the database."""
 
 import sys
-from typing import Dict
+from typing import Dict, Union
 
 from life_recorder import helper as h
 from .base import LifeRecorder
@@ -15,7 +15,7 @@ class DeleteLifeRecorder(LifeRecorder):
         self.input_messages[
             "delete"] = "Are you sure you want to delete this record? [Y(y) / N(n)]: "
 
-    def act(self, identifier: int = None) -> None:
+    def act(self, identifier: Union[str, None] = None):
         """Add a new life record to database."""
 
         if identifier is None:
