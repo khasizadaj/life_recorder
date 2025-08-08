@@ -54,7 +54,7 @@ def main(args: List[str]) -> None:
     action = fac.action_factory(command)
 
     # perform the action
-    action().act(identifier)
+    action.act(identifier)
 
 
 if __name__ == '__main__':

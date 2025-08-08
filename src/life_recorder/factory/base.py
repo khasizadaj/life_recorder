@@ -7,6 +7,8 @@ import json
 from dataclasses import dataclass
 import os
 
+from abc import ABC, abstractmethod
+
 PARENT_DIR = f"C:\\\\Users\\{os.getenv('username')}"
 
 
@@ -71,7 +73,7 @@ class Commands():
 COMMANDS = Commands()
 
 
-class LifeRecorder:
+class LifeRecorder(ABC):
     """Class that implements writing and reading of life records."""
 
     _file_name = "life_records.json"
@@ -80,10 +82,11 @@ class LifeRecorder:
         self._database = self.load_database()
         self.input_messages = {}
 
+    @abstractmethod
     def act(self, identifier: str = None):
         """This method implements main purpose of current class."""
 
-        raise NotImplementedError()
+        pass
 
     @property
     def database(self):
