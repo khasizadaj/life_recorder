@@ -12,12 +12,12 @@ def action_factory(command: str) -> LifeRecorder:
     """Factory that decides which action to perform based on the command."""
 
     if command in COMMANDS.create:
-        fac = CreateLifeRecorder
+        return CreateLifeRecorder()
     elif command in COMMANDS.read:
-        fac = ReadLifeRecorder
+        return ReadLifeRecorder()
     elif command in COMMANDS.update:
-        fac = UpdateLifeRecorder
+        return UpdateLifeRecorder()
     elif command in COMMANDS.delete:
-        fac = DeleteLifeRecorder
-
-    return fac
+        return DeleteLifeRecorder()
+    else:
+        raise ValueError("Command doesn't exist.")
