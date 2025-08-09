@@ -5,7 +5,6 @@ This module contains LifeRecorder class which is used to work with records.
 
 from enum import Enum
 import json
-from dataclasses import dataclass
 import os
 
 from abc import ABC, abstractmethod
