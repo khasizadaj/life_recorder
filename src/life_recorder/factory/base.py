@@ -8,9 +8,10 @@ import json
 import os
 
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import Union
 
-PARENT_DIR = f"C:\\\\Users\\{os.getenv('username')}"
+from life_recorder.helper import get_data_dir
 
 
 class Commands(Enum):
@@ -27,6 +28,7 @@ class LifeRecorder(ABC):
     """Class that implements writing and reading of life records."""
 
     _file_name = "life_records.json"
+    _data_dir = get_data_dir()
 
     def __init__(self):
         self._database = self.load_database()
@@ -91,14 +93,14 @@ class LifeRecorder(ABC):
         If there is `.data` directory,it will make new one and return it.
         """
 
-        data_dir = f"{PARENT_DIR}\\.data"
+        data_dir = Path(self._data_dir)
         is_dir = os.path.isdir(data_dir)
         if is_dir:
             pass
         else:
             os.mkdir(data_dir)
 
-        data_dir = f"{data_dir}\\{self.file_name}"
+        data_dir = Path.joinpath(data_dir, self.file_name)
         return data_dir
 
     @staticmethod
