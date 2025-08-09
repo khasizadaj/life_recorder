@@ -1,7 +1,11 @@
 """Module contains helper functions for LifeRecorder class."""
 
 from datetime import datetime
+import os
+import platform
 from typing import Dict, List
+
+from life_recorder import config
 
 
 def get_timestamp() -> str:
@@ -73,3 +77,29 @@ def print_pretty_record(record: str) -> None:
         f"Title: {record['title']} \n"
         f"Content: {record['content']}"
     )
+
+
+def get_user() -> str:
+    """Function returns the user name."""
+
+    path = os.path.expanduser("~")
+    if platform.system() == "Windows":
+        return path.split("\\")[-1]
+    elif platform.system() == "Linux":
+        return path.split("/")[-1]
+    else:
+        raise NotImplementedError("Platform is not supported.")
+
+
+def get_data_dir() -> str:
+    """Function returns the data directory of the program."""
+
+    if config.DEBUG:
+        return "./data"
+
+    if platform.system() == "Windows":
+        return f"C:\\\\Users\\{get_user()}\\.data"
+    elif platform.system() == "Linux":
+        return f"/home/{get_user()}/.data"
+    else:
+        raise NotImplementedError("Platform is not supported.")
