@@ -94,11 +94,8 @@ class LifeRecorder(ABC):
         """
 
         data_dir = Path(self._data_dir)
-        is_dir = os.path.isdir(data_dir)
-        if is_dir:
-            pass
-        else:
-            os.mkdir(data_dir)
+        if (data_dir.exists() and data_dir.is_dir()) is False:
+            data_dir.mkdir(parents=True, exist_ok=True)
 
         return Path.joinpath(data_dir, self.file_name)
 
