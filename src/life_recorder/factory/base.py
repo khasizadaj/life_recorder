@@ -82,7 +82,7 @@ class LifeRecorder(ABC):
             json.dump(records, output)
 
     @property
-    def path_to_file(self) -> str:
+    def path_to_file(self) -> Path:
         """Property method that returns the path to the file."""
 
         return self.get_path_to_file()
@@ -100,8 +100,7 @@ class LifeRecorder(ABC):
         else:
             os.mkdir(data_dir)
 
-        data_dir = Path.joinpath(data_dir, self.file_name)
-        return data_dir
+        return Path.joinpath(data_dir, self.file_name)
 
     @staticmethod
     def get_empty_database():
