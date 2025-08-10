@@ -11,7 +11,7 @@ class TestHelper(unittest.TestCase):
     @patch("platform.system")
     @patch("os.path.expanduser")
     def test_get_data_dir(self, mox_expanduser, mock_platform):
-        mox_expanduser.return_value = "C:\\Users\\life_user"
+        mox_expanduser.return_value = "C:\\\\Users\\life_user"
         mock_platform.return_value = "Windows"
         self.assertEqual(get_data_dir(), "C:\\\\Users\\life_user\\.data")
 

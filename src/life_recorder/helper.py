@@ -98,8 +98,8 @@ def get_data_dir() -> str:
         return "./data"
 
     if platform.system() == "Windows":
-        return f"C:\\\\Users\\{get_user()}\\.data"
+        return f"{os.path.expanduser('~')}\\.data"
     elif platform.system() == "Linux":
-        return f"/home/{get_user()}/.data"
+        return f"{os.path.expanduser('~')}/.data"
     else:
         raise NotImplementedError("Platform is not supported.")
