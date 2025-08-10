@@ -5,7 +5,6 @@ from typing import Union
 from loguru import logger
 import click
 
-import life_recorder.check as ch
 import life_recorder.factory.factory as fac
 
 

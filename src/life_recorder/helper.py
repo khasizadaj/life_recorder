@@ -1,7 +1,11 @@
 """Module contains helper functions for LifeRecorder class."""
 
 from datetime import datetime
+import os
+import platform
 from typing import Dict, List
+
+from life_recorder import config
 
 
 def get_timestamp() -> str:
@@ -73,3 +77,19 @@ def print_pretty_record(record: str) -> None:
         f"Title: {record['title']} \n"
         f"Content: {record['content']}"
     )
+
+
+def get_user() -> str:
+    """Function returns the user name."""
+
+    path = os.path.expanduser("~")
+    return os.path.basename(path)
+
+
+def get_data_dir() -> str:
+    """Function returns the data directory of the program."""
+
+    if config.DEBUG:
+        return "./data"
+
+    return os.path.join(os.path.expanduser('~'), '.data')
