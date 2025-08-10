@@ -11,9 +11,9 @@ from textual.widgets import (
 )
 
 from life_recorder.factory.base import LifeRecorderDB
+from life_recorder.factory.read import ReadLifeRecorder
 
-DB = LifeRecorderDB()
-DB.init()
+DB = ReadLifeRecorder()
 
 
 class Notes(HorizontalGroup):

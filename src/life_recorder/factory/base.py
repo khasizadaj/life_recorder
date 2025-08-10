@@ -105,57 +105,5 @@ class LifeRecorder(ABC):
         return {"last_id": 0, "records": {}}
 
 
-class LifeRecorderDB:
-    """Class that implements writing and reading of life records."""
-
-    def __init__(self, path_to_file: Path | None = None):
-        if path_to_file is None:
-            path_to_file = self.get_path_to_file()
-        self.path_to_file = path_to_file
-
-    def init(self):
-        """Function initializes the database."""
-        self._database = self.load_database()
-
-    @property
-    def database(self):
-        """Function return database attribute of the class."""
-
-        return self._database
-
-    @property
-    def records(self):
-        """Function returns records saved so far."""
-
-        return self._database["records"]
-
-    def load_database(self):
-        """This property return a dictionary of records."""
-        try:
-            with open(self.path_to_file, "r") as file:
-                return json.load(file)
-        except FileNotFoundError:
-            with open(self.path_to_file, "w") as file:
-                empty_db = self.get_empty_database()
-                json.dump(empty_db, file)
-                return empty_db
-
-    def get_empty_database(self):
-        """Function returns an empty database to start saving data."""
-
-        return {"records": {}}
-
-    def get_path_to_file(self):
-        """
-        Method returns the path to the file.
-        If there is `.data` directory,it will make new one and return it.
-        """
-
-        data_dir = Path(get_data_dir())
-        if (data_dir.exists() and data_dir.is_dir()) is False:
-            data_dir.mkdir(parents=True, exist_ok=True)
-
-        return Path.joinpath(data_dir, "life_records.json")
-
 if __name__ == "__main__":
     print(__doc__)
