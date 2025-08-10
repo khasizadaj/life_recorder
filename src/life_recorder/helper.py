@@ -83,12 +83,7 @@ def get_user() -> str:
     """Function returns the user name."""
 
     path = os.path.expanduser("~")
-    if platform.system() == "Windows":
-        return path.split("\\")[-1]
-    elif platform.system() == "Linux":
-        return path.split("/")[-1]
-    else:
-        raise NotImplementedError("Platform is not supported.")
+    return os.path.basename(path)
 
 
 def get_data_dir() -> str:
@@ -97,9 +92,4 @@ def get_data_dir() -> str:
     if config.DEBUG:
         return "./data"
 
-    if platform.system() == "Windows":
-        return f"{os.path.expanduser('~')}\\.data"
-    elif platform.system() == "Linux":
-        return f"{os.path.expanduser('~')}/.data"
-    else:
-        raise NotImplementedError("Platform is not supported.")
+    return os.path.join(os.path.expanduser('~'), '.data')
