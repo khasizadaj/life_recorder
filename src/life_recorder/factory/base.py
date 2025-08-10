@@ -4,7 +4,6 @@ This module contains LifeRecorder class which is used to work with records.
 
 from enum import Enum
 import json
-import os
 
 from abc import ABC, abstractmethod
 from pathlib import Path
@@ -89,7 +88,7 @@ class LifeRecorder(ABC):
     def get_path_to_file(self):
         """
         Method returns the path to the file.
-        If there is `.data` directory,it will make new one and return it.
+        If there is `.data` directory, it will make new one and return it.
         """
 
         data_dir = Path(self._data_dir)

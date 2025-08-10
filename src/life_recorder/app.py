@@ -1,4 +1,3 @@
-import json
 from textual.app import App, ComposeResult
 from textual.containers import HorizontalGroup, VerticalGroup
 from textual.widgets import (
@@ -10,7 +9,6 @@ from textual.widgets import (
     Markdown,
 )
 
-from life_recorder.factory.base import LifeRecorderDB
 from life_recorder.factory.read import ReadLifeRecorder
 
 DB = ReadLifeRecorder()
@@ -27,7 +25,7 @@ class Notes(HorizontalGroup):
 
 
 class LifeRecorderApp(App):
-    """A Textual app to manage stopwatches."""
+    """A Textual app to manage life records"""
 
     BINDINGS = [("d", "toggle_dark", "Toggle dark mode")]
 
