@@ -28,6 +28,8 @@ $ life_recorder <command> <identifier>
 $ life_recorder <command> <identifier>
 ```
 
+> For example: `life_recorder read lr-1`
+
 ### Commands
 
 - `create`
