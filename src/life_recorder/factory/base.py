@@ -9,6 +9,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Union
 
+from life_recorder import config
 from life_recorder.helper import get_data_dir
 
 
@@ -77,7 +78,10 @@ class LifeRecorder(ABC):
         """Writes life log to file."""
 
         with open(self.path_to_file, "w") as output:
-            json.dump(records, output)
+            if config.DEBUG:
+                json.dump(records, output, indent=4)
+            else:
+                json.dump(records, output)
 
     @property
     def path_to_file(self) -> Path:
