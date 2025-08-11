@@ -8,6 +8,7 @@ from textual.widgets import (
     ListView,
     Markdown,
     MarkdownViewer,
+    Rule,
 )
 from textual import log
 
@@ -20,7 +21,7 @@ class Notes(HorizontalScroll):
     def compose(self) -> ComposeResult:
         yield ListView(
             *[
-                ListItem(Label(f"\n #{x['id']}: {x['title']}\n"), id=x["id"])
+                ListItem(Label(f"\n [ #{x['id']} ] {x['title']}\n"), id=x["id"])
                 for x in DB.records.values()
             ],
             id="list-view",
@@ -32,6 +33,7 @@ class Notes(HorizontalScroll):
             ),
             id="note-view",
         )
+
 
 class LifeRecorderApp(App):
     """A Textual app to manage life records"""
@@ -57,7 +59,7 @@ class LifeRecorderApp(App):
             else "textual-light"
         )
 
-    def on_list_view_selected(self):
+    async def on_list_view_selected(self):
         list_view = self.query_one(selector="#list-view", expect_type=ListView)
 
         if not list_view.highlighted_child:
@@ -67,14 +69,21 @@ class LifeRecorderApp(App):
             selector="#note-view", expect_type=VerticalScroll
         )
         # remove all markdown viewers (we should only have one)
-        self.query(MarkdownViewer).remove()
+        await note_view.remove_children()
 
-        log.info(DB.records[list_view.highlighted_child.id])
-        content = DB.records[list_view.highlighted_child.id]["content"]
+        details = DB.records[list_view.highlighted_child.id]
+        log.info(details)
+        content = details["content"]
 
         selected_item_in_markdown = MarkdownViewer(
             content, show_table_of_contents=False
         )
+
+        note_view.mount(Markdown(f"# {details['title']} [ #{details['id']} ]"))
+        note_view.mount(Rule())
+        note_view.mount(Label(f" 🏷️ {details['tag']}", expand=True))
+        note_view.mount(Label(f" ⏳ {details['timestamp']}", expand=True))
+        note_view.mount(Rule())
         note_view.mount(selected_item_in_markdown)
 
 
