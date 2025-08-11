@@ -8,6 +8,7 @@ from textual.widgets import (
     ListView,
     Markdown,
     MarkdownViewer,
+    Rule,
 )
 from textual import log
 
@@ -20,18 +21,25 @@ class Notes(HorizontalScroll):
     def compose(self) -> ComposeResult:
         yield ListView(
             *[
-                ListItem(Label(f"\n #{x['id']}: {x['title']}\n"), id=x["id"])
+                ListItem(
+                    Label(f"\n [ #{x['id']} ] {x['title']}\n"), id=x["id"]
+                )
                 for x in DB.records.values()
             ],
             id="list-view",
         )
         yield VerticalScroll(
-            MarkdownViewer(
-                "# Note View \nNote will be displayed here.",
-                show_table_of_contents=False,
+            Markdown("# Note View", id="note-title"),
+            Rule(),
+            Label(" 🏷️ new-note", expand=True, id="note-tag"),
+            Label(" ⏳ soon...", expand=True, id="note-timestamp"),
+            Rule(),
+            Markdown(
+                "\n\nNote details will be displayed here.", id="note-content"
             ),
             id="note-view",
         )
+
 
 class LifeRecorderApp(App):
     """A Textual app to manage life records"""
@@ -57,25 +65,35 @@ class LifeRecorderApp(App):
             else "textual-light"
         )
 
-    def on_list_view_selected(self):
-        list_view = self.query_one(selector="#list-view", expect_type=ListView)
+    async def on_list_view_selected(self, event: ListView.Selected) -> None:
+        list_view = event.control
 
         if not list_view.highlighted_child:
             return
 
-        note_view = self.query_one(
-            selector="#note-view", expect_type=VerticalScroll
-        )
-        # remove all markdown viewers (we should only have one)
-        self.query(MarkdownViewer).remove()
+        details = DB.records[list_view.highlighted_child.id]
+        if sorted(details.keys()) != sorted(
+            ["id", "timestamp", "tag", "title", "content"]
+        ):
+            raise ValueError("Record details do not match expected structure.")
 
-        log.info(DB.records[list_view.highlighted_child.id])
-        content = DB.records[list_view.highlighted_child.id]["content"]
+        title = self.query_one("#note-title", Markdown)
+        if title.source != details.get("title", ""):
+            title.update(
+                f"# {details.get('title', '')} [ #{details.get('id', '')} ]"
+            )
 
-        selected_item_in_markdown = MarkdownViewer(
-            content, show_table_of_contents=False
-        )
-        note_view.mount(selected_item_in_markdown)
+        tag = self.query_one("#note-tag", Label)
+        if tag.renderable != details.get("tag", ""):
+            tag.update(f" 🏷️ {details.get('tag', '')}")
+
+        timestamp = self.query_one("#note-timestamp", Label)
+        if timestamp.renderable != details.get("timestamp", ""):
+            timestamp.update(f" ⏳ {details.get('timestamp', '')}")
+
+        content = self.query_one("#note-content", Markdown)
+        if content.source != details.get("content", ""):
+            content.update(details.get("content", ""))
 
 
 def main():
