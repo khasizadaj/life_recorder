@@ -30,8 +30,8 @@ class Notes(HorizontalScroll):
         yield VerticalScroll(
             Markdown("# Note View", id="note-title"),
             Rule(),
-            Label(" 🏷️ new-note", expand=True, id="note-tag"),
-            Label(" ⏳ soon...", expand=True, id="note-timestamp"),
+            Label("🏷️ new-note", expand=True, id="note-tag"),
+            Label("⏳ soon...", expand=True, id="note-timestamp"),
             Rule(),
             Markdown(
                 "\n\nNote details will be displayed here.", id="note-content"
@@ -43,6 +43,7 @@ class Notes(HorizontalScroll):
 class LifeRecorderApp(App):
     """A Textual app to manage life records"""
 
+    CSS_PATH = "styles/app.tcss"
     BINDINGS = [("d", "toggle_dark", "Toggle dark mode")]
 
     def compose(self) -> ComposeResult:
@@ -84,11 +85,11 @@ class LifeRecorderApp(App):
 
         tag = self.query_one("#note-tag", Label)
         if tag.renderable != details.get("tag", ""):
-            tag.update(f" 🏷️ {details.get('tag', '')}")
+            tag.update(f"🏷️ {details.get('tag', '')}")
 
         timestamp = self.query_one("#note-timestamp", Label)
         if timestamp.renderable != details.get("timestamp", ""):
-            timestamp.update(f" ⏳ {details.get('timestamp', '')}")
+            timestamp.update(f"⏳ {details.get('timestamp', '')}")
 
         content = self.query_one("#note-content", Markdown)
         if content.source != details.get("content", ""):
