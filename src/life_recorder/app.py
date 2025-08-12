@@ -8,6 +8,7 @@ from textual.widgets import (
     ListView,
     Markdown,
     Rule,
+    Button
 )
 from textual import log
 
@@ -36,6 +37,7 @@ class Notes(HorizontalScroll):
             Markdown(
                 "\n\nNote details will be displayed here.", id="note-content"
             ),
+            Button("Delete", variant="error"),
             id="note-view",
         )
 

@@ -1,3 +1,7 @@
 #note-view Label {
     margin-left: 2
 }
+
+Button {
+    margin-left: 2 
+}
