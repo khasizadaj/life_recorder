@@ -94,6 +94,8 @@ class TestLifeRecorder(unittest.TestCase):
         life_recorder.delete("lr-1")
         self.assertNotIn("lr-1", life_recorder.records)
 
+        # Create a new LifeRecorder instance to verify that the deletion
+        # persists in the database file.
         life_recorder = LifeRecorder(path_to_db=self.path_to_temp_db)
         self.assertNotIn("lr-1", life_recorder.records)
 
