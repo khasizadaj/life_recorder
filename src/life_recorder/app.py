@@ -7,14 +7,13 @@ from textual.widgets import (
     ListItem,
     ListView,
     Markdown,
-    MarkdownViewer,
     Rule,
 )
 from textual import log
 
-from life_recorder.factory.read import ReadLifeRecorder
+from life_recorder.base import LifeRecorder
 
-DB = ReadLifeRecorder()
+DB = LifeRecorder()
 
 
 class Notes(HorizontalScroll):

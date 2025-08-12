@@ -67,7 +67,7 @@ def add_breakline(func, func_args: List, before: bool = False,
         print()
 
 
-def print_pretty_record(record: str) -> None:
+def print_pretty_record(record: dict) -> None:
     """Prints a record with provided identifier (id)."""
 
     print(

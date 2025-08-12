@@ -1,0 +1,26 @@
+{
+    "last_id": 3,
+    "records": {
+        "lr-1": {
+            "id": "lr-1",
+            "timestamp": "10-Aug-2025 16:06",
+            "tag": "tag",
+            "title": "Note to forget",
+            "content": "## I think I need help!"
+        },
+        "lr-2": {
+            "id": "lr-2",
+            "timestamp": "11-Aug-2025 07:32",
+            "tag": "hhh",
+            "title": "Note to cherish",
+            "content": "Having something to enjoy is a blessing."
+        },
+        "lr-3": {
+            "id": "lr-3",
+            "timestamp": "10-Aug-2025 16:06",
+            "tag": "hi",
+            "title": "Note about life",
+            "content": "## I am doing okay. I am lovely."
+        }
+    }
+}

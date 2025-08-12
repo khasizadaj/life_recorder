@@ -5,6 +5,8 @@ from typing import Union
 from loguru import logger
 import click
 
+from life_recorder.base import LifeRecorder
+from life_recorder import helper as h
 import life_recorder.factory.factory as fac
 
 
@@ -37,8 +39,21 @@ def read(identifier: Union[str, None]) -> None:
 
     IDENTIFIER is id of the record. If not provided, it will read all records.
     """
-    action = fac.action_factory("read")
-    action.act(identifier=identifier)
+    life_recorder = LifeRecorder()
+    if identifier is not None:
+        record = life_recorder.read_one(identifier)
+        if record is None:
+            message = "Provided identifier didn't match with any record."
+            h.add_breakline(print, func_args=[message], both=True)
+            sys.exit()
+
+        h.add_breakline(h.print_pretty_record,
+                        func_args=[record], after=True)
+        sys.exit()
+
+    for record  in life_recorder.read().values():
+        h.add_breakline(h.print_pretty_record,
+                        func_args=[record], after=True)
     sys.exit()
 
 
