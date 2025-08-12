@@ -23,6 +23,15 @@ class TestLifeRecorder(unittest.TestCase):
         with open(cls.path_to_db, "r") as f:
             cls.db = json.load(f)
 
+    def setUp(self) -> None:
+        self.path_to_temp_db = shutil.copy(self.path_to_db, "test_db.json")
+        return super().setUp()
+
+    def tearDown(self) -> None:
+        if os.path.exists(self.path_to_temp_db):
+            os.remove(self.path_to_temp_db)
+        return super().tearDown()
+
     def test_class_has_mandatory_methods(self):
         life_recorder = LifeRecorder()
         self.assertTrue(hasattr(life_recorder, "read"))
@@ -79,6 +88,26 @@ class TestLifeRecorder(unittest.TestCase):
 
         record = life_recorder.read_one("non_existent")
         self.assertIsNone(record)
+
+    def test_delete(self):
+        life_recorder = LifeRecorder(path_to_db=self.path_to_temp_db)
+        life_recorder.delete("lr-1")
+        self.assertNotIn("lr-1", life_recorder.records)
+
+        # Create a new LifeRecorder instance to verify that the deletion
+        # persists in the database file.
+        life_recorder = LifeRecorder(path_to_db=self.path_to_temp_db)
+        self.assertNotIn("lr-1", life_recorder.records)
+
+    def test_delete_raises_error_with_incorrect_key(self):
+        life_recorder = LifeRecorder(path_to_db=self.path_to_temp_db)
+        with self.assertRaises(ValueError):
+            life_recorder.delete("non_existent")
+
+    def test_delete_raises_error_with_non_string_identifier(self):
+        life_recorder = LifeRecorder(path_to_db=self.path_to_temp_db)
+        with self.assertRaises(TypeError):
+            life_recorder.delete(12345)  # type: ignore
 
 
 if __name__ == "__main__":

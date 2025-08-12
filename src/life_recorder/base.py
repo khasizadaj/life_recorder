@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 from life_recorder.helper import get_data_dir
+from life_recorder import config
 
 
 class LifeRecorder:
@@ -29,14 +30,34 @@ class LifeRecorder:
         """Read all life records."""
         return self.records
 
-    def read_one(self, identifier: str):
+    def read_one(self, identifier: str) -> dict[str, str] | None:
         """Read a single life record by its identifier."""
         return self.records.get(identifier, None)
+
+    def delete(self, identifier: str):
+        """Delete a life record by its identifier."""
+
+        if isinstance(identifier, str) is False:
+            raise TypeError("Identifier must be a string.")
+
+        if identifier in self.records:
+            del self.records[identifier]
+            self._save_database()
+        else:
+            raise ValueError(f"No record found with identifier: {identifier}")
 
     def _load_database(self):
         """Load the database from the JSON file."""
         with open(self.path_to_db, "r") as f:
             return json.load(f)
+
+    def _save_database(self):
+        """Save the current state of the database to the JSON file."""
+        with open(self.path_to_db, "w") as f:
+            if config.DEBUG:
+                json.dump(self._db, f, indent=4)
+            else:
+                json.dump(self._db, f)
 
     def _init_db(self, init_path_to_db: Path) -> None:
         """Initialize the database with default values."""
