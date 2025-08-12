@@ -51,7 +51,7 @@ def read(identifier: Union[str, None]) -> None:
                         func_args=[record], after=True)
         sys.exit()
 
-    for record  in life_recorder.read().values():
+    for record in life_recorder.read().values():
         h.add_breakline(h.print_pretty_record,
                         func_args=[record], after=True)
     sys.exit()
