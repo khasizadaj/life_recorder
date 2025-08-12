@@ -4,6 +4,7 @@ import sys
 from typing import Union
 from loguru import logger
 import click
+from rich import print
 
 from life_recorder.base import LifeRecorder
 from life_recorder import helper as h
@@ -47,20 +48,18 @@ def read(identifier: Union[str, None]) -> None:
             h.add_breakline(print, func_args=[message], both=True)
             sys.exit()
 
-        h.add_breakline(h.print_pretty_record,
-                        func_args=[record], after=True)
+        h.add_breakline(h.print_pretty_record, func_args=[record], after=True)
         sys.exit()
 
     for record in life_recorder.read().values():
-        h.add_breakline(h.print_pretty_record,
-                        func_args=[record], after=True)
+        h.add_breakline(h.print_pretty_record, func_args=[record], after=True)
     sys.exit()
 
 
 @main.command()
 @click.argument("identifier", required=True, type=click.STRING)
 @logger.catch
-def update(identifier: Union[str, None]) -> None:
+def update(identifier: str) -> None:
     """
     Updates the record.
 
@@ -74,14 +73,47 @@ def update(identifier: Union[str, None]) -> None:
 @main.command()
 @click.argument("identifier", required=True, type=click.STRING)
 @logger.catch
-def delete(identifier: Union[str, None]) -> None:
+def delete(identifier: str) -> None:
     """
     Deletes the record.
 
     IDENTIFIER is id of the record.
     """
-    action = fac.action_factory("delete")
-    action.act(identifier=identifier)
+
+    life_recorder = LifeRecorder()
+    record = life_recorder.read_one(identifier)
+    if record is None:
+        message = "There is no record with the given identifier."
+        h.add_breakline(print, func_args=[message], both=True)
+        sys.exit()
+
+    # message = "Record you want to delete is:"
+    # h.add_breakline(print, func_args=[message], after=True)
+
+    click.echo(click.style("\nRecord you want to delete is:\n", fg="green"))
+    click.echo(f"{h.pretty_record(record)}\n")
+
+    if (
+        click.confirm(
+            click.style(
+                "Are you sure you want to delete this record?", fg="red"
+            ),
+            default=None,
+        )
+        is False
+    ):
+        message = "Every record matters! I am glad that you didn't delete it!"
+        click.echo(click.style(message, fg="green"))
+        sys.exit()
+
+    life_recorder.delete(identifier)
+
+    message = "Deleting record ... Don't stop adding new records!"
+    click.echo(click.style(message, fg="white"))
+
+    message = "Successfully deleted record."
+    click.echo(click.style(message, fg="green"))
+
     sys.exit()
 
 

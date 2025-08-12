@@ -2,7 +2,8 @@
 
 from datetime import datetime
 import os
-import platform
+import click
+from rich import print
 from typing import Dict, List
 
 from life_recorder import config
@@ -66,17 +67,20 @@ def add_breakline(func, func_args: List, before: bool = False,
         func(*func_args)
         print()
 
+def pretty_record(record: dict) -> str:
+    """Returns a pretty-printed string of a record."""
+
+    return (
+        f"{click.style('Id:', fg='white')} #{record['id']} \n"
+        f"{click.style('Timestamp:', fg='white')} {record['timestamp']} \n"
+        f"{click.style('Tag:', fg='white')} {record['tag']} \n"
+        f"{click.style('Title:', fg='white')} {record['title']} \n"
+        f"{click.style('Content:', fg='white')} {record['content']}"
+    )
+
 
 def print_pretty_record(record: dict) -> None:
-    """Prints a record with provided identifier (id)."""
-
-    print(
-        f"Id: #{record['id']} \n"
-        f"Timestamp: {record['timestamp']} \n"
-        f"Tag: {record['tag']} \n"
-        f"Title: {record['title']} \n"
-        f"Content: {record['content']}"
-    )
+    click.echo(pretty_record(record))
 
 
 def get_user() -> str:
