@@ -3,7 +3,6 @@
 # factories
 from .base import LifeRecorder, Commands
 from .create import CreateLifeRecorder
-from .read import ReadLifeRecorder
 from .update import UpdateLifeRecorder
 from .delete import DeleteLifeRecorder
 
@@ -13,8 +12,6 @@ def action_factory(command: str) -> LifeRecorder:
 
     if command == Commands.CREATE:
         return CreateLifeRecorder()
-    elif command == Commands.READ:
-        return ReadLifeRecorder()
     elif command == Commands.UPDATE:
         return UpdateLifeRecorder()
     elif command == Commands.DELETE:
