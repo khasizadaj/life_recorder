@@ -111,6 +111,28 @@ class Notes(HorizontalScroll):
         for button in buttons:
             button.styles.display = "block"
 
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        button_id = event.control.id
+        if button_id is None:
+            return
+
+        if button_id == "button-delete":
+            log.info("Delete button pressed.")
+            viewing_pane = self.query_one("#note-view", ViewingPane)
+
+            log.info(f"Deleting note with ID of {viewing_pane.record_id}")
+            try:
+                DB.delete(viewing_pane.record_id)
+            except ValueError as e:
+                log.error(f"Invalid record ID: {e}")
+                return
+
+            list_item = self.query_one(f"#{viewing_pane.record_id}", ListItem)
+            list_item.remove()
+
+            log.info(f"Deleted record with ID: {viewing_pane.record_id}")
+            viewing_pane.reset()
+            log.info("Viewing pane reset to default state.")
 
 class LifeRecorderApp(App):
     """A Textual app to manage life records"""
@@ -139,28 +161,7 @@ class LifeRecorderApp(App):
             else "textual-light"
         )
 
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        button_id = event.control.id
-        if button_id is None:
-            return
 
-        if button_id == "button-delete":
-            log.info("Delete button pressed.")
-            viewing_pane = self.query_one("#note-view", ViewingPane)
-
-            log.info(f"Deleting note with ID of {viewing_pane.record_id}")
-            try:
-                DB.delete(viewing_pane.record_id)
-            except ValueError as e:
-                log.error(f"Invalid record ID: {e}")
-                return
-
-            list_item = self.query_one(f"#{viewing_pane.record_id}", ListItem)
-            list_item.remove()
-
-            log.info(f"Deleted record with ID: {viewing_pane.record_id}")
-            viewing_pane.reset()
-            log.info("Viewing pane reset to default state.")
 
 
 def main():
