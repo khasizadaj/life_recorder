@@ -5,3 +5,7 @@
 Button {
     margin-left: 2 
 }
+
+#note-view Button {
+    display: none;
+}
