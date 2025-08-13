@@ -45,7 +45,7 @@ class ViewingPane(VerticalScroll):
             "\n\nNote details will be displayed here."
         )
         for button in self.query(Button):
-            button.styles.display = None
+            button.styles.display = "none"
 
 
 class Notes(HorizontalScroll):
