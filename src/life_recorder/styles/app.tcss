@@ -1,0 +1,11 @@
+#note-view Label {
+    margin-left: 2
+}
+
+Button {
+    margin-left: 2 
+}
+
+#note-view Button {
+    display: none;
+}
