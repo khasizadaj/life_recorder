@@ -8,13 +8,44 @@ from textual.widgets import (
     ListView,
     Markdown,
     Rule,
-    Button
+    Button,
 )
 from textual import log
 
 from life_recorder.base import LifeRecorder
 
 DB = LifeRecorder()
+
+
+class ViewingPane(VerticalScroll):
+    """A pane to view the details of a selected note."""
+
+    def __init__(self, *args, **kwargs):
+        self.record_id = kwargs.pop("record_id", "default")
+        super().__init__(*args, **kwargs)
+
+    def compose(self) -> ComposeResult:
+        yield Markdown("# Note View", id="note-title")
+        yield Rule()
+        yield Label("🏷️ new-note", expand=True, id="note-tag")
+        yield Label("⏳ soon...", expand=True, id="note-timestamp")
+        yield Rule()
+        yield Markdown(
+            "\n\nNote details will be displayed here.", id="note-content"
+        )
+        yield Button("Delete", variant="error", id="button-delete")
+
+    def reset(self):
+        """Reset the viewing pane to its default state."""
+        self.record_id = "default"
+        self.query_one("#note-title", Markdown).update("# Note View")
+        self.query_one("#note-tag", Label).update("🏷️ new-note")
+        self.query_one("#note-timestamp", Label).update("⏳ soon...")
+        self.query_one("#note-content", Markdown).update(
+            "\n\nNote details will be displayed here."
+        )
+        for button in self.query(Button):
+            button.styles.display = None
 
 
 class Notes(HorizontalScroll):
@@ -28,17 +59,11 @@ class Notes(HorizontalScroll):
             ],
             id="list-view",
         )
-        yield VerticalScroll(
-            Markdown("# Note View", id="note-title"),
-            Rule(),
-            Label("🏷️ new-note", expand=True, id="note-tag"),
-            Label("⏳ soon...", expand=True, id="note-timestamp"),
-            Rule(),
-            Markdown(
-                "\n\nNote details will be displayed here.", id="note-content"
-            ),
-            Button("Delete", variant="error"),
+        yield ViewingPane(
+            record_id="default",
             id="note-view",
+            can_focus=False,
+            can_focus_children=True,
         )
 
 
@@ -55,7 +80,9 @@ class LifeRecorderApp(App):
             Markdown(
                 "## Welcome to Life Recorder. \nReady to jot down your thoughts?"
             ),
-            Notes(),
+            Notes(can_focus=False, can_focus_children=True, id="notes"),
+            can_focus=False,
+            can_focus_children=True,
         )
         yield Footer()
 
@@ -79,6 +106,9 @@ class LifeRecorderApp(App):
         ):
             raise ValueError("Record details do not match expected structure.")
 
+        viewing_pane = self.query_one("#note-view", ViewingPane)
+        viewing_pane.record_id = details.get("id", "default")
+
         title = self.query_one("#note-title", Markdown)
         if title.source != details.get("title", ""):
             title.update(
@@ -96,6 +126,33 @@ class LifeRecorderApp(App):
         content = self.query_one("#note-content", Markdown)
         if content.source != details.get("content", ""):
             content.update(details.get("content", ""))
+
+        buttons = viewing_pane.query(Button)
+        for button in buttons:
+            button.styles.display = "block"
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        button_id = event.control.id
+        if button_id is None:
+            return
+
+        if button_id == "button-delete":
+            log.info("Delete button pressed.")
+            viewing_pane = self.query_one("#note-view", ViewingPane)
+
+            log.info(f"Deleting note with ID of {viewing_pane.record_id}")
+            try:
+                DB.delete(viewing_pane.record_id)
+            except ValueError as e:
+                log.error(f"Invalid record ID: {e}")
+                return
+
+            list_item = self.query_one(f"#{viewing_pane.record_id}", ListItem)
+            list_item.remove()
+
+            log.info(f"Deleted record with ID: {viewing_pane.record_id}")
+            viewing_pane.reset()
+            log.info("Viewing pane reset to default state.")
 
 
 def main():
