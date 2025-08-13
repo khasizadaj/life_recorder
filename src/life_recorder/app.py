@@ -49,6 +49,8 @@ class ViewingPane(VerticalScroll):
 
 
 class Notes(HorizontalScroll):
+    BINDINGS = [("escape", "reset_view", "Reset the viewing pane")]
+
     def compose(self) -> ComposeResult:
         yield ListView(
             *[
@@ -66,33 +68,11 @@ class Notes(HorizontalScroll):
             can_focus_children=True,
         )
 
-
-class LifeRecorderApp(App):
-    """A Textual app to manage life records"""
-
-    CSS_PATH = "styles/app.tcss"
-    BINDINGS = [("d", "toggle_dark", "Toggle dark mode")]
-
-    def compose(self) -> ComposeResult:
-        """Create child widgets for the app."""
-        yield Header(show_clock=True, name="Life Recorder")
-        yield VerticalScroll(
-            Markdown(
-                "## Welcome to Life Recorder. \nReady to jot down your thoughts?"
-            ),
-            Notes(can_focus=False, can_focus_children=True, id="notes"),
-            can_focus=False,
-            can_focus_children=True,
-        )
-        yield Footer()
-
-    def action_toggle_dark(self) -> None:
-        """An action to toggle dark mode."""
-        self.theme = (
-            "textual-dark"
-            if self.theme == "textual-light"
-            else "textual-light"
-        )
+    def action_reset_view(self) -> None:
+        self.query_one("#note-view", ViewingPane).reset()
+        log.info("Escape key pressed, viewing pane reset to default state.")
+        list_view = self.query_one("#list-view", ListView)
+        list_view.post_message(message=ListView.Highlighted(list_view, None))
 
     async def on_list_view_selected(self, event: ListView.Selected) -> None:
         list_view = event.control
@@ -130,6 +110,34 @@ class LifeRecorderApp(App):
         buttons = viewing_pane.query(Button)
         for button in buttons:
             button.styles.display = "block"
+
+
+class LifeRecorderApp(App):
+    """A Textual app to manage life records"""
+
+    CSS_PATH = "styles/app.tcss"
+    BINDINGS = [("d", "toggle_dark", "Toggle dark mode")]
+
+    def compose(self) -> ComposeResult:
+        """Create child widgets for the app."""
+        yield Header(show_clock=True, name="Life Recorder")
+        yield VerticalScroll(
+            Markdown(
+                "## Welcome to Life Recorder. \nReady to jot down your thoughts?"
+            ),
+            Notes(can_focus=False, can_focus_children=True, id="notes"),
+            can_focus=False,
+            can_focus_children=True,
+        )
+        yield Footer()
+
+    def action_toggle_dark(self) -> None:
+        """An action to toggle dark mode."""
+        self.theme = (
+            "textual-dark"
+            if self.theme == "textual-light"
+            else "textual-light"
+        )
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         button_id = event.control.id
