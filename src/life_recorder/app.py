@@ -52,15 +52,20 @@ class Notes(HorizontalScroll):
     BINDINGS = [("escape", "reset_view", "Reset the viewing pane")]
 
     def compose(self) -> ComposeResult:
-        yield ListView(
-            *[
-                ListItem(
-                    Label(f"\n [ #{x['id']} ] {x['title']}\n"), id=x["id"]
-                )
-                for x in DB.records.values()
-            ],
-            id="list-view",
-        )
+        with VerticalScroll(can_focus=False, can_focus_children=True):
+            yield Button(
+                "New Note",
+                id="button-new",
+                variant="primary",
+            )
+            yield ListView(
+                *[
+                    ListItem(Label(f"\n [ #{x['id']} ] {x['title']}"), id=x["id"])
+                    for x in DB.records.values()
+                ],
+                id="list-view",
+            )
+
         yield ViewingPane(
             record_id="default",
             id="note-view",
@@ -133,6 +138,10 @@ class Notes(HorizontalScroll):
             log.info(f"Deleted record with ID: {viewing_pane.record_id}")
             viewing_pane.reset()
             log.info("Viewing pane reset to default state.")
+
+        elif button_id == "button-new":
+            log.info("New note button pressed.")
+
 
 class LifeRecorderApp(App):
     """A Textual app to manage life records"""
