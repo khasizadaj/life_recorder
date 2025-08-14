@@ -57,6 +57,7 @@ class Notes(HorizontalScroll):
                 "New Note",
                 id="button-new",
                 variant="primary",
+                disabled=True,
             )
             yield ListView(
                 *[
