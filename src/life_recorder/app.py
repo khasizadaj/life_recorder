@@ -52,15 +52,23 @@ class Notes(HorizontalScroll):
     BINDINGS = [("escape", "reset_view", "Reset the viewing pane")]
 
     def compose(self) -> ComposeResult:
-        yield ListView(
-            *[
-                ListItem(
-                    Label(f"\n [ #{x['id']} ] {x['title']}\n"), id=x["id"]
-                )
-                for x in DB.records.values()
-            ],
-            id="list-view",
-        )
+        with VerticalScroll(can_focus=False, can_focus_children=True):
+            yield Button(
+                "New Note",
+                id="button-new",
+                variant="primary",
+                disabled=True,
+            )
+            yield ListView(
+                *[
+                    ListItem(
+                        Label(f"[ #{x['id']} ] {x['title']}"), id=x["id"]
+                    )
+                    for x in DB.records.values()
+                ],
+                id="list-view",
+            )
+
         yield ViewingPane(
             record_id="default",
             id="note-view",
@@ -134,6 +142,10 @@ class Notes(HorizontalScroll):
             viewing_pane.reset()
             log.info("Viewing pane reset to default state.")
 
+        elif button_id == "button-new":
+            log.info("New note button pressed.")
+
+
 class LifeRecorderApp(App):
     """A Textual app to manage life records"""
 
@@ -145,7 +157,8 @@ class LifeRecorderApp(App):
         yield Header(show_clock=True, name="Life Recorder")
         yield VerticalScroll(
             Markdown(
-                "## Welcome to Life Recorder. \nReady to jot down your thoughts?"
+                "## Welcome to Life Recorder. \nReady to jot down your thoughts?",
+                id="intro",
             ),
             Notes(can_focus=False, can_focus_children=True, id="notes"),
             can_focus=False,
@@ -160,8 +173,6 @@ class LifeRecorderApp(App):
             if self.theme == "textual-light"
             else "textual-light"
         )
-
-
 
 
 def main():
