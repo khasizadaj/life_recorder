@@ -60,7 +60,9 @@ class Notes(HorizontalScroll):
             )
             yield ListView(
                 *[
-                    ListItem(Label(f"\n [ #{x['id']} ] {x['title']}"), id=x["id"])
+                    ListItem(
+                        Label(f"[ #{x['id']} ] {x['title']}"), id=x["id"]
+                    )
                     for x in DB.records.values()
                 ],
                 id="list-view",
@@ -154,7 +156,8 @@ class LifeRecorderApp(App):
         yield Header(show_clock=True, name="Life Recorder")
         yield VerticalScroll(
             Markdown(
-                "## Welcome to Life Recorder. \nReady to jot down your thoughts?"
+                "## Welcome to Life Recorder. \nReady to jot down your thoughts?",
+                id="intro",
             ),
             Notes(can_focus=False, can_focus_children=True, id="notes"),
             can_focus=False,
@@ -169,8 +172,6 @@ class LifeRecorderApp(App):
             if self.theme == "textual-light"
             else "textual-light"
         )
-
-
 
 
 def main():

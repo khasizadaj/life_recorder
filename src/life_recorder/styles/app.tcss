@@ -2,10 +2,25 @@
     margin-left: 2
 }
 
+#intro {
+    border-bottom: solid $primary;}
+
 Button {
     margin-left: 2 
 }
 
 #note-view Button {
     display: none;
+}
+
+ListView {
+    background: transparent;
+    & > ListItem {
+        padding: 1 1;
+        border: solid $primary;
+    }
+}
+
+#notes #button-new {
+    margin: 1;
 }
