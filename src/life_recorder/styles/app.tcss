@@ -3,7 +3,8 @@
 }
 
 #intro {
-    border-bottom: solid $primary;}
+    border-bottom: solid $primary;
+}
 
 Button {
     margin-left: 2 
