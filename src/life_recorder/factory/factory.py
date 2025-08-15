@@ -14,7 +14,5 @@ def action_factory(command: str) -> LifeRecorder:
         return CreateLifeRecorder()
     elif command == Commands.UPDATE:
         return UpdateLifeRecorder()
-    elif command == Commands.DELETE:
-        return DeleteLifeRecorder()
     else:
         raise ValueError("Command doesn't exist.")
