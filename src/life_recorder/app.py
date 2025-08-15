@@ -60,7 +60,7 @@ class NewNoteForm(Static):
                 validate_on=["submitted"],
                 validators=[Length(minimum=2, maximum=25)],
             )
-            yield Label("Tag is invalid.", variant="error", classes="error", id="new-note-error-tag")
+            yield Label("", variant="error", classes="error", id="new-note-error-tag")
             yield Static("")
 
             yield Button("Save", variant="primary", id="button-save")
