@@ -10,7 +10,7 @@ Button {
     margin-left: 2 
 }
 
-#note-view Button {
+#note-view #button-delete {
     display: none;
 }
 
@@ -24,4 +24,15 @@ ListView {
 
 #notes #button-new {
     margin: 1;
+}
+
+#new-note-container {
+    border: solid white;
+    padding: 0;
+}
+
+#new-note-container .error {
+    display: none;
+    color: $error;
+    background: transparent;
 }
