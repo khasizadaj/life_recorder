@@ -44,8 +44,7 @@ class ViewingPane(VerticalScroll):
         self.query_one("#note-content", Markdown).update(
             "\n\nNote details will be displayed here."
         )
-        for button in self.query(Button):
-            button.styles.display = "none"
+        self.query_one("#button-delete", Button).styles.display = "none"
 
 
 class Notes(HorizontalScroll):
