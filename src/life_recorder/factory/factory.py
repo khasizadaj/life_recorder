@@ -4,7 +4,6 @@
 from .base import LifeRecorder, Commands
 from .create import CreateLifeRecorder
 from .update import UpdateLifeRecorder
-from .delete import DeleteLifeRecorder
 
 
 def action_factory(command: str) -> LifeRecorder:
