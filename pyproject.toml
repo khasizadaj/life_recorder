@@ -17,7 +17,17 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
 ]
 requires-python = ">=3.10,<4.0"
-dependencies = ["loguru>=0.7.3", "click (>=8.2.1,<9.0.0)", "python-dotenv (>=1.1.1,<2.0.0)", "textual (>=5.3.0,<6.0.0)"]
+dependencies = [
+    "loguru>=0.7.3",
+    "click (>=8.2.1,<9.0.0)",
+    "python-dotenv (>=1.1.1,<2.0.0)",
+    "textual (>=5.3.0,<6.0.0)",
+]
+
+[tool.poetry]
+packages = [{ include = "life_recorder", from = "src" }]
+include = [{ path = "life_recorder/*.tcss", format = ["sdist", "wheel"] }]
+exclude = ["tests", "tests/**"]
 
 [tool.poetry.group.dev]
 optional = true
@@ -31,11 +41,5 @@ life_recorder = "life_recorder.cli:main"
 life_recorder-app = "life_recorder.app:main"
 
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
-
-[tool.setuptools.packages.find]
-where = ["src"]
-
-[tool.setuptools.package-dir]
-"" = "src"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
