@@ -108,6 +108,16 @@ class NewNoteForm(Static):
         content_input = self.content_input
         res = content_input.validate(content_input.value)
         log.info(f"Content input validation result: {res}")
+        content_error_label = self.query_one("#new-note-error-content", Label)
+        if res is not None and not res.is_valid:
+            description = res.failures[0].description
+            if description is not None:
+                content_error_label.update(description)
+                log.error(f"Content input validation failed: {description}")
+            content_error_label.styles.display = "block"
+            return
+        else:
+            content_error_label.styles.display = "none"
 
     async def create_note(self) -> None:
 
