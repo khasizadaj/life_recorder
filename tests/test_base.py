@@ -76,6 +76,43 @@ class TestLifeRecorder(unittest.TestCase):
 
         os.remove(path_to_db)
 
+    def test_create(self):
+        new_note = {
+            "tag": "test",
+            "title": "Test Record",
+            "content": "This is a test record.",
+        }
+        life_recorder = LifeRecorder(path_to_db=self.path_to_temp_db)
+        result = life_recorder.create(new_note)
+        self.assertIn("lr-4", life_recorder.records)
+        self.assertCountEqual(
+            list(result.keys()), ["id", "timestamp"] + list(new_note.keys())
+        )
+        self.assertDictContainsSubset(new_note, life_recorder.records["lr-4"])
+        self.assertEqual(life_recorder.db["last_id"], 4)
+
+        life_recorder = LifeRecorder(path_to_db=self.path_to_temp_db)
+        self.assertIn("lr-4", life_recorder.records)
+        self.assertEqual(result, life_recorder.records["lr-4"])
+        self.assertDictContainsSubset(new_note, life_recorder.records["lr-4"])
+
+    def test_create_pass_invalid_input(self):
+        life_recorder = LifeRecorder(path_to_db=self.path_to_temp_db)
+        with self.assertRaises(TypeError):
+            life_recorder.create("invalid_input")  # type: ignore
+
+        with self.assertRaises(TypeError):
+            life_recorder.create(None)  # type: ignore
+
+        with self.assertRaises(TypeError):
+            life_recorder.create(1)  # type: ignore
+
+        with self.assertRaises(ValueError):
+            life_recorder.create({})
+
+        with self.assertRaises(ValueError):
+            life_recorder.create({"wrong_key": "test"})
+
     def test_read_all(self):
         life_recorder = LifeRecorder(path_to_db=self.path_to_db)
         records = life_recorder.read()
@@ -84,6 +121,7 @@ class TestLifeRecorder(unittest.TestCase):
     def test_read_one(self):
         life_recorder = LifeRecorder(path_to_db=self.path_to_db)
         record = life_recorder.read_one("lr-1")
+        assert record is not None
         self.assertDictEqual(record, self.db["records"]["lr-1"])
 
         record = life_recorder.read_one("non_existent")

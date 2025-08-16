@@ -6,7 +6,7 @@ import json
 import os
 from pathlib import Path
 
-from .helper import get_data_dir
+from .helper import get_data_dir, get_timestamp
 from . import config
 
 
@@ -26,6 +26,32 @@ class LifeRecorder:
                 self._init_db(init_path_to_db)
             self.path_to_db = init_path_to_db
         self._db = self._load_database()
+
+    def create(self, record: dict[str, str]) -> dict[str, str]:
+        if not isinstance(record, dict):
+            raise TypeError(
+                "Record must be a dictionary, but it's {}".format(type(record))
+            )
+
+        if (
+            "tag" not in record
+            or "title" not in record
+            or "content" not in record
+        ):
+            raise ValueError(
+                "Record must contain 'tag', 'title', and 'content'."
+            )
+
+        record_id = f"lr-{self.db['last_id'] + 1}"
+        new_record = record.copy()
+        new_record.update({
+            "id": record_id,
+            "timestamp": get_timestamp()
+        })
+        self.records.update({record_id: new_record})
+        self.db["last_id"] += 1
+        self._save_database()
+        return self.db["records"][record_id]
 
     def read(self):
         """Read all life records."""
@@ -73,6 +99,6 @@ class LifeRecorder:
         return self._db
 
     @property
-    def records(self):
+    def records(self) -> dict[str, dict[str, str]]:
         """Return the records dictionary."""
         return self._db.get("records", {})
