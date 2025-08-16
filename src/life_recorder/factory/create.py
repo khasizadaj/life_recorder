@@ -1,9 +1,9 @@
 """Module contains class that adds new records to the database."""
 
 import sys
-from typing import Dict, Tuple, Union
+from typing import Tuple, Union
 
-from life_recorder import helper as h
+from .. import helper as h
 from .base import LifeRecorder
 
 

@@ -1,7 +1,8 @@
 import unittest
-from life_recorder import config
-from life_recorder.helper import get_data_dir, get_user
 from unittest.mock import patch
+
+from src.life_recorder import config
+from src.life_recorder.helper import get_user
 
 
 class TestHelper(unittest.TestCase):

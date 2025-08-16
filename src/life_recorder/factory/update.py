@@ -3,7 +3,7 @@
 import sys
 from typing import Tuple, Dict, Union
 
-from life_recorder import helper as h
+from .. import helper as h
 from .base import LifeRecorder
 
 

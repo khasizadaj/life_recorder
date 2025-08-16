@@ -1,9 +1,9 @@
 import unittest
 
-from life_recorder.factory.factory import action_factory
-from life_recorder.factory.base import LifeRecorder
-from life_recorder.factory.create import CreateLifeRecorder
-from life_recorder.factory.update import UpdateLifeRecorder
+from src.life_recorder.factory.factory import action_factory
+from src.life_recorder.factory.base import LifeRecorder
+from src.life_recorder.factory.create import CreateLifeRecorder
+from src.life_recorder.factory.update import UpdateLifeRecorder
 
 
 class TestActionFactory(unittest.TestCase):

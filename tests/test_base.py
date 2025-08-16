@@ -10,7 +10,7 @@ import shutil
 import unittest
 from unittest.mock import patch
 
-from life_recorder.base import LifeRecorder
+from src.life_recorder.base import LifeRecorder
 
 
 class TestLifeRecorder(unittest.TestCase):
@@ -50,7 +50,7 @@ class TestLifeRecorder(unittest.TestCase):
         self.assertEqual(life_recorder.records, self.db["records"])
         self.assertDictEqual(life_recorder.db, self.db)
 
-    @patch("life_recorder.base.get_data_dir")
+    @patch("src.life_recorder.base.get_data_dir")
     def test_path_to_db(self, mock_get_data_dir):
         path_to_data_dir = "./mock"
         mock_get_data_dir.return_value = path_to_data_dir
