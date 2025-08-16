@@ -1,9 +1,9 @@
 import unittest
 
-from life_recorder.factory.factory import action_factory
-from life_recorder.factory.base import LifeRecorder
-from life_recorder.factory.create import CreateLifeRecorder
-from life_recorder.factory.delete import DeleteLifeRecorder
+from src.life_recorder.factory.factory import action_factory
+from src.life_recorder.factory.base import LifeRecorder
+from src.life_recorder.factory.create import CreateLifeRecorder
+from src.life_recorder.factory.update import UpdateLifeRecorder
 
 
 class TestActionFactory(unittest.TestCase):
@@ -18,9 +18,9 @@ class TestActionFactory(unittest.TestCase):
         self.assertIsInstance(action, LifeRecorder)
         self.assertIsInstance(action, CreateLifeRecorder)
 
-        action = action_factory("delete")
+        action = action_factory("update")
         self.assertIsInstance(action, LifeRecorder)
-        self.assertIsInstance(action, DeleteLifeRecorder)
+        self.assertIsInstance(action, UpdateLifeRecorder)
 
     def test_action_factory_raises_error(self):
         """

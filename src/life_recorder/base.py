@@ -5,8 +5,9 @@ Module that provides `LifeRecorder` class for life record management.
 import json
 import os
 from pathlib import Path
-from life_recorder.helper import get_data_dir
-from life_recorder import config
+
+from .helper import get_data_dir
+from . import config
 
 
 class LifeRecorder:

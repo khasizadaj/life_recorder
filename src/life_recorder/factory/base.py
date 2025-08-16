@@ -9,8 +9,8 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Union
 
-from life_recorder import config
-from life_recorder.helper import get_data_dir
+from ..helper import get_data_dir
+from .. import config
 
 
 class Commands(Enum):

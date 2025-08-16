@@ -6,7 +6,7 @@ import click
 from rich import print
 from typing import Dict, List
 
-from life_recorder import config
+from . import config
 
 
 def get_timestamp() -> str:
