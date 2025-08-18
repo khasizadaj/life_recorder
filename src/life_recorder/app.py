@@ -217,17 +217,10 @@ class Notes(HorizontalScroll):
 
     def compose(self) -> ComposeResult:
         with VerticalScroll(can_focus=False, can_focus_children=True):
-            yield Button(
-                "New Note",
-                id="button-new",
-                variant="primary"
-            )
+            yield Button("New Note", id="button-new", variant="primary")
             yield NewNoteForm()
             yield ListView(
-                *[
-                    ListItem(Label(f"[ #{x['id']} ] {x['title']}"), id=x["id"])
-                    for x in DB.records.values()
-                ],
+                *[self.create_list_item(x) for x in DB.records.values()],
                 id="list-view",
             )
 
@@ -246,14 +239,18 @@ class Notes(HorizontalScroll):
         new_note_form.query_one("#new-note-title", Input).focus()
 
     @on(NewNoteForm.Created)
-    async def reset_list_after_new_note(
-        self, event: NewNoteForm.Created
-    ) -> None:
-        log.info(f"New note created, updating list view for {event.record['id']}")
-        await self.recompose()
+    async def update_list_view(self, event: NewNoteForm.Created) -> None:
+        log.debug(
+            f"New note created, updating list view for {event.record['id']}"
+        )
+
+        list_item = self.create_list_item(event.record)
+        self.list_view.mount(list_item)
+        log.debug("List view updated with new note")
+
         new_note_form = self.query_one(NewNoteForm)
         new_note_form.styles.display = "none"
-        await new_note_form.recompose()
+        log.debug("New note form hidden after submission.")
 
     def action_reset_view(self) -> None:
         self.query_one("#note-view", ViewingPane).reset()
@@ -265,7 +262,10 @@ class Notes(HorizontalScroll):
         list_view = event.control
 
         if not list_view.highlighted_child:
-            return
+            raise ValueError("No highlighted child in ListView.")
+
+        if not list_view.highlighted_child.id:
+            raise ValueError("No ID found for highlighted child in ListView.")
 
         details = DB.records[list_view.highlighted_child.id]
         if sorted(details.keys()) != sorted(
@@ -323,6 +323,18 @@ class Notes(HorizontalScroll):
 
         elif button_id == "button-new":
             log.info("New note button pressed.")
+
+    def create_list_item(self, record: dict[str, str]) -> ListItem:
+        """Create new node for note to live in."""
+        text = f"[ #{record['id']} ] {record['title']}"
+        label_id = f"note-label-{record['id']}"
+        label = Label(text, id=label_id)
+        list_item = ListItem(label, id=record["id"])
+        return list_item
+
+    @property
+    def list_view(self) -> ListView:
+        return self.query_one("#list-view", ListView)
 
 
 class LifeRecorderApp(App):
