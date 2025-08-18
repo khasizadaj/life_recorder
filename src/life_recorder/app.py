@@ -88,8 +88,8 @@ class NewNoteForm(Static):
         if not validation_result:
             return
         note = await self.create_note()
-        await self.recompose()
         self.post_message(self.Created(note))
+        await self.reset()
 
     async def validate_form(self):
         tag_input = self.tag_input
@@ -161,6 +161,25 @@ class NewNoteForm(Static):
     @property
     def content_input(self):
         return self.query_one("#new-note-content", Input)
+
+    async def reset(self):
+        """Reset the form inputs to their default state."""
+        self.tag_input.value = ""
+        self.title_input.value = ""
+        self.content_input.value = ""
+
+        # Clear error labels and hide them
+        tag_error_label = self.query_one("#new-note-error-tag", Label)
+        tag_error_label.update("")
+        tag_error_label.styles.display = "none"
+
+        title_error_label = self.query_one("#new-note-error-title", Label)
+        title_error_label.update("")
+        title_error_label.styles.display = "none"
+
+        content_error_label = self.query_one("#new-note-error-content", Label)
+        content_error_label.update("")
+        content_error_label.styles.display = "none"
 
 
 class ViewingPane(VerticalScroll):
