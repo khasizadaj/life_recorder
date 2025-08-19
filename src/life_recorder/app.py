@@ -325,7 +325,7 @@ class Notes(HorizontalScroll):
             log.info("New note button pressed.")
 
     def create_list_item(self, record: dict[str, str]) -> ListItem:
-        """Create new node for note to live in."""
+        """Create new list item for note to live in."""
         text = f"[ #{record['id']} ] {record['title']}"
         label_id = f"note-label-{record['id']}"
         label = Label(text, id=label_id)
