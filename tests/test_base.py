@@ -88,13 +88,15 @@ class TestLifeRecorder(unittest.TestCase):
         self.assertCountEqual(
             list(result.keys()), ["id", "timestamp"] + list(new_note.keys())
         )
-        self.assertDictContainsSubset(new_note, life_recorder.records["lr-4"])
+        for key, value in new_note.items():
+            self.assertEqual(life_recorder.records["lr-4"][key], value)
         self.assertEqual(life_recorder.db["last_id"], 4)
 
         life_recorder = LifeRecorder(path_to_db=self.path_to_temp_db)
         self.assertIn("lr-4", life_recorder.records)
         self.assertEqual(result, life_recorder.records["lr-4"])
-        self.assertDictContainsSubset(new_note, life_recorder.records["lr-4"])
+        for key, value in new_note.items():
+            self.assertEqual(life_recorder.records["lr-4"][key], value)
 
     def test_create_pass_invalid_input(self):
         life_recorder = LifeRecorder(path_to_db=self.path_to_temp_db)
