@@ -44,10 +44,7 @@ class LifeRecorder:
 
         record_id = f"lr-{self.db['last_id'] + 1}"
         new_record = record.copy()
-        new_record.update({
-            "id": record_id,
-            "timestamp": get_timestamp()
-        })
+        new_record.update({"id": record_id, "timestamp": get_timestamp()})
         self.records.update({record_id: new_record})
         self.db["last_id"] += 1
         self._save_database()
@@ -60,6 +57,42 @@ class LifeRecorder:
     def read_one(self, identifier: str) -> dict[str, str] | None:
         """Read a single life record by its identifier."""
         return self.records.get(identifier, None)
+
+    def update(
+        self, identifier: str, record: dict[str, str]
+    ) -> dict[str, str]:
+        """Update a life record by its identifier."""
+
+        if isinstance(identifier, str) is False:
+            raise TypeError("Identifier must be a string.")
+
+        if not isinstance(record, dict):
+            raise TypeError(
+                "Record must be a dictionary, but it's {}".format(type(record))
+            )
+
+        if (
+            "tag" not in record
+            or "title" not in record
+            or "content" not in record
+        ):
+            raise ValueError(
+                "Record must contain 'tag', 'title', and 'content'."
+            )
+
+        if identifier not in self.records:
+            raise ValueError(f"No record found with identifier: {identifier}")
+
+        # Keep the original id and timestamp, update the rest
+        old_record = self.records[identifier]
+        updated_record = record.copy()
+        updated_record.update(
+            {"id": old_record["id"], "timestamp": old_record["timestamp"]}
+        )
+
+        self.records[identifier] = updated_record
+        self._save_database()
+        return self.records[identifier]
 
     def delete(self, identifier: str):
         """Delete a life record by its identifier."""
