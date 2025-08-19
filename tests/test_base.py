@@ -32,6 +32,12 @@ class TestLifeRecorder(unittest.TestCase):
             os.remove(self.path_to_temp_db)
         return super().tearDown()
 
+    def assertDictContainsSubset(self, subset: dict, dictionary: dict) -> None:
+        """Helper method to check that subset items are contained in dictionary."""
+        for key, value in subset.items():
+            self.assertIn(key, dictionary)
+            self.assertEqual(dictionary[key], value)
+
     def test_class_has_mandatory_methods(self):
         life_recorder = LifeRecorder()
         self.assertTrue(hasattr(life_recorder, "read"))
@@ -88,15 +94,13 @@ class TestLifeRecorder(unittest.TestCase):
         self.assertCountEqual(
             list(result.keys()), ["id", "timestamp"] + list(new_note.keys())
         )
-        for key, value in new_note.items():
-            self.assertEqual(life_recorder.records["lr-4"][key], value)
+        self.assertDictContainsSubset(new_note, life_recorder.records["lr-4"])
         self.assertEqual(life_recorder.db["last_id"], 4)
 
         life_recorder = LifeRecorder(path_to_db=self.path_to_temp_db)
         self.assertIn("lr-4", life_recorder.records)
         self.assertEqual(result, life_recorder.records["lr-4"])
-        for key, value in new_note.items():
-            self.assertEqual(life_recorder.records["lr-4"][key], value)
+        self.assertDictContainsSubset(new_note, life_recorder.records["lr-4"])
 
     def test_create_pass_invalid_input(self):
         life_recorder = LifeRecorder(path_to_db=self.path_to_temp_db)
@@ -161,9 +165,7 @@ class TestLifeRecorder(unittest.TestCase):
         result = life_recorder.update("lr-1", updated_data)
         
         # Check the returned record
-        self.assertEqual(result["tag"], "updated_tag")
-        self.assertEqual(result["title"], "Updated Title")
-        self.assertEqual(result["content"], "Updated content")
+        self.assertDictContainsSubset(updated_data, result)
         # ID and timestamp should remain the same
         self.assertEqual(result["id"], self.db["records"]["lr-1"]["id"])
         self.assertEqual(result["timestamp"], self.db["records"]["lr-1"]["timestamp"])
@@ -171,9 +173,7 @@ class TestLifeRecorder(unittest.TestCase):
         # Verify it persists in database
         life_recorder = LifeRecorder(path_to_db=self.path_to_temp_db)
         updated_record = life_recorder.read_one("lr-1")
-        self.assertEqual(updated_record["tag"], "updated_tag")
-        self.assertEqual(updated_record["title"], "Updated Title")
-        self.assertEqual(updated_record["content"], "Updated content")
+        self.assertDictContainsSubset(updated_data, updated_record)
 
     def test_update_raises_error_with_non_string_identifier(self):
         life_recorder = LifeRecorder(path_to_db=self.path_to_temp_db)
