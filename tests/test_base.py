@@ -149,6 +149,53 @@ class TestLifeRecorder(unittest.TestCase):
         with self.assertRaises(TypeError):
             life_recorder.delete(12345)  # type: ignore
 
+    def test_update(self):
+        life_recorder = LifeRecorder(path_to_db=self.path_to_temp_db)
+        
+        # Test updating a record
+        updated_data = {
+            "tag": "updated_tag",
+            "title": "Updated Title", 
+            "content": "Updated content"
+        }
+        result = life_recorder.update("lr-1", updated_data)
+        
+        # Check the returned record
+        self.assertEqual(result["tag"], "updated_tag")
+        self.assertEqual(result["title"], "Updated Title")
+        self.assertEqual(result["content"], "Updated content")
+        # ID and timestamp should remain the same
+        self.assertEqual(result["id"], self.db["records"]["lr-1"]["id"])
+        self.assertEqual(result["timestamp"], self.db["records"]["lr-1"]["timestamp"])
+        
+        # Verify it persists in database
+        life_recorder = LifeRecorder(path_to_db=self.path_to_temp_db)
+        updated_record = life_recorder.read_one("lr-1")
+        self.assertEqual(updated_record["tag"], "updated_tag")
+        self.assertEqual(updated_record["title"], "Updated Title")
+        self.assertEqual(updated_record["content"], "Updated content")
+
+    def test_update_raises_error_with_non_string_identifier(self):
+        life_recorder = LifeRecorder(path_to_db=self.path_to_temp_db)
+        with self.assertRaises(TypeError):
+            life_recorder.update(12345, {"tag": "test", "title": "Test", "content": "Test"})  # type: ignore
+
+    def test_update_raises_error_with_invalid_record(self):
+        life_recorder = LifeRecorder(path_to_db=self.path_to_temp_db)
+        
+        # Test invalid record type
+        with self.assertRaises(TypeError):
+            life_recorder.update("lr-1", "invalid_record")  # type: ignore
+            
+        # Test missing required fields
+        with self.assertRaises(ValueError):
+            life_recorder.update("lr-1", {"tag": "test"})
+
+    def test_update_raises_error_with_nonexistent_identifier(self):
+        life_recorder = LifeRecorder(path_to_db=self.path_to_temp_db)
+        with self.assertRaises(ValueError):
+            life_recorder.update("non_existent", {"tag": "test", "title": "Test", "content": "Test"})
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -8,7 +8,6 @@ from rich import print
 
 from life_recorder.base import LifeRecorder
 from life_recorder import helper as h
-import life_recorder.factory.factory as fac
 
 
 @click.group()
@@ -26,8 +25,28 @@ def main() -> None:
 def create() -> None:
     """Creates the new record."""
 
-    action = fac.action_factory("create")
-    action.act()
+    life_recorder = LifeRecorder()
+
+    # Get user inputs
+    tag = input("What is the tag of this record? (optional): ")
+    
+    title = input("What is the title of this record?: ")
+    while title == "":
+        title = input("Please enter a title; it can't be blank: ")
+
+    content = input("What is the content of this record?: ")
+    while content == "":
+        content = input("Please enter a content; it can't be blank: ")
+
+    # Create the record
+    record_data = {
+        "tag": tag,
+        "title": title,
+        "content": content
+    }
+    
+    new_record = life_recorder.create(record_data)
+    h.add_breakline(h.print_pretty_record, func_args=[new_record], both=True)
     sys.exit()
 
 
@@ -65,8 +84,47 @@ def update(identifier: str) -> None:
 
     IDENTIFIER is id of the record.
     """
-    action = fac.action_factory("update")
-    action.act(identifier=identifier)
+    life_recorder = LifeRecorder()
+    
+    # Get the existing record
+    old_record = life_recorder.read_one(identifier)
+    if old_record is None:
+        message = "Provided identifier didn't match with any record."
+        h.add_breakline(print, func_args=[message], both=True)
+        sys.exit()
+
+    # Show current record to user
+    print("Current record:")
+    h.add_breakline(h.print_pretty_record, func_args=[old_record], after=True)
+
+    print('Usage: Add new detail for respective field. If you want to keep '
+          'any value untouched, press "Enter".')
+
+    # Get user inputs for updating
+    tag = input("What is the updated tag? (optional): ")
+    title = input("What is the updated title?: ")
+    content = input("What is the updated content?: ")
+
+    # Use existing values if user didn't provide new ones
+    if tag == "":
+        tag = old_record['tag']
+    if title == "":
+        title = old_record['title']
+    if content == "":
+        content = old_record['content']
+
+    # Create updated record
+    updated_record = {
+        "tag": tag,
+        "title": title,
+        "content": content
+    }
+
+    # Update the record using the base class method
+    life_recorder.update(identifier, updated_record)
+
+    message = f"Record with #{identifier} is updated."
+    h.add_breakline(print, func_args=[message], after=True)
     sys.exit()
 
 
