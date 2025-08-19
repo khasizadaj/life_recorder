@@ -15,11 +15,16 @@ Button {
 }
 
 ListView {
+    min-height: 80%;
     background: transparent;
     & > ListItem {
         padding: 1 1;
         border: solid $primary;
     }
+}
+
+NewNoteForm {
+    display: none;
 }
 
 #notes #button-new {
@@ -28,7 +33,25 @@ ListView {
 
 #new-note-container {
     border: solid white;
-    padding: 0;
+    padding: 1;
+}
+
+#new-note-container Label {
+    margin: 0 1;
+}
+
+#new-note-container #new-note-form-title {
+    margin-left: 1;
+    color: $primary;
+    text-style: bold;
+}
+
+#new-note-container Input {
+    margin: 0;
+}
+
+#new-note-container #button-save {
+    margin: 0 1;
 }
 
 #new-note-container .error {

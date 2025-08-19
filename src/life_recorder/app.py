@@ -1,4 +1,5 @@
 from textual.app import App, ComposeResult
+from textual.message import Message
 from textual.containers import HorizontalScroll, VerticalScroll, VerticalGroup
 from textual.widgets import (
     Footer,
@@ -21,15 +22,14 @@ DB = LifeRecorder()
 
 
 class NewNoteForm(Static):
-
     BINDINGS = [
         ("ctrl+enter", "action_submit", "Submit the form"),
         ("enter", "action_submit", "Submit the form"),
     ]
 
     def compose(self) -> ComposeResult:
-        with VerticalGroup(id="new-note-container", classes="new-note", disabled=True):
-            yield Markdown("### Add new note")
+        with VerticalGroup(id="new-note-container", classes="new-note"):
+            yield Label("Add new note", id="new-note-form-title")
             yield Static("")
 
             yield Label("Title")
@@ -39,7 +39,9 @@ class NewNoteForm(Static):
                 validate_on=["submitted"],
                 validators=[Length(minimum=1, maximum=50)],
             )
-            yield Label("", variant="error", classes="error", id="new-note-error-title")
+            yield Label(
+                "", variant="error", classes="error", id="new-note-error-title"
+            )
             yield Static("")
 
             yield Label("Content")
@@ -49,7 +51,12 @@ class NewNoteForm(Static):
                 validators=[Length(minimum=1, maximum=50)],
                 id="new-note-content",
             )
-            yield Label("", variant="error", classes="error", id="new-note-error-content")
+            yield Label(
+                "",
+                variant="error",
+                classes="error",
+                id="new-note-error-content",
+            )
             yield Static("")
 
             yield Label("Tag (Optional)")
@@ -60,21 +67,29 @@ class NewNoteForm(Static):
                 validate_on=["submitted"],
                 validators=[Length(minimum=2, maximum=25)],
             )
-            yield Label("", variant="error", classes="error", id="new-note-error-tag")
+            yield Label(
+                "", variant="error", classes="error", id="new-note-error-tag"
+            )
             yield Static("")
 
             yield Button("Save", variant="primary", id="button-save")
 
-    # async def on_button_pressed(self, event: Input.Submitted) -> None:
-    #     """Handle input submission."""
-    #     await self.validate_form()
-    #     await self.create_note()
+    class Created(Message):
+        """Note created message."""
+
+        def __init__(self, record: dict[str, str]) -> None:
+            self.record = record
+            super().__init__()
 
     @on(Input.Submitted)
     @on(Button.Pressed, selector="#button-save")
     async def submit(self, _: Button.Pressed | Input.Submitted) -> None:
-        await self.validate_form()
-        await self.create_note()
+        validation_result = await self.validate_form()
+        if not validation_result:
+            return
+        note = await self.create_note()
+        self.post_message(self.Created(note))
+        await self.reset()
 
     async def validate_form(self):
         tag_input = self.tag_input
@@ -87,7 +102,7 @@ class NewNoteForm(Static):
                 tag_error_label.update(description)
                 log.error(f"Tag input validation failed: {description}")
             tag_error_label.styles.display = "block"
-            return
+            return False
         else:
             tag_error_label.styles.display = "none"
 
@@ -101,7 +116,7 @@ class NewNoteForm(Static):
                 title_error_label.update(description)
                 log.error(f"Title input validation failed: {description}")
             title_error_label.styles.display = "block"
-            return
+            return False
         else:
             title_error_label.styles.display = "none"
 
@@ -115,16 +130,25 @@ class NewNoteForm(Static):
                 content_error_label.update(description)
                 log.error(f"Content input validation failed: {description}")
             content_error_label.styles.display = "block"
-            return
+            return False
         else:
             content_error_label.styles.display = "none"
 
-    async def create_note(self) -> None:
+        return True
 
+    async def create_note(self) -> dict[str, str]:
         log.info("Creating new note with provided details.")
         log.info(f"Tag: {self.tag_input.value}")
         log.info(f"Title: {self.title_input.value}")
         log.info(f"Content: {self.content_input.value}")
+        note = DB.create(
+            {
+                "tag": self.tag_input.value,
+                "title": self.title_input.value,
+                "content": self.content_input.value,
+            }
+        )
+        return note
 
     @property
     def tag_input(self):
@@ -138,6 +162,25 @@ class NewNoteForm(Static):
     def content_input(self):
         return self.query_one("#new-note-content", Input)
 
+    async def reset(self):
+        """Reset the form inputs to their default state."""
+        self.tag_input.value = ""
+        self.title_input.value = ""
+        self.content_input.value = ""
+
+        # Clear error labels and hide them
+        tag_error_label = self.query_one("#new-note-error-tag", Label)
+        tag_error_label.update("")
+        tag_error_label.styles.display = "none"
+
+        title_error_label = self.query_one("#new-note-error-title", Label)
+        title_error_label.update("")
+        title_error_label.styles.display = "none"
+
+        content_error_label = self.query_one("#new-note-error-content", Label)
+        content_error_label.update("")
+        content_error_label.styles.display = "none"
+
 
 class ViewingPane(VerticalScroll):
     """A pane to view the details of a selected note."""
@@ -147,8 +190,6 @@ class ViewingPane(VerticalScroll):
         super().__init__(*args, **kwargs)
 
     def compose(self) -> ComposeResult:
-        # TODO Activate form
-        # yield NewNoteForm()
         yield Markdown("# Note View", id="note-title")
         yield Rule()
         yield Label("🏷️ new-note", expand=True, id="note-tag")
@@ -176,17 +217,10 @@ class Notes(HorizontalScroll):
 
     def compose(self) -> ComposeResult:
         with VerticalScroll(can_focus=False, can_focus_children=True):
-            yield Button(
-                "New Note",
-                id="button-new",
-                variant="primary",
-                disabled=True,
-            )
+            yield Button("New Note", id="button-new", variant="primary")
+            yield NewNoteForm()
             yield ListView(
-                *[
-                    ListItem(Label(f"[ #{x['id']} ] {x['title']}"), id=x["id"])
-                    for x in DB.records.values()
-                ],
+                *[self.create_list_item(x) for x in DB.records.values()],
                 id="list-view",
             )
 
@@ -196,6 +230,27 @@ class Notes(HorizontalScroll):
             can_focus=False,
             can_focus_children=True,
         )
+
+    @on(Button.Pressed, "#button-new")
+    async def create_new_note(self, event: Button.Pressed) -> None:
+        log.info("New note button pressed.")
+        new_note_form = self.query_one(NewNoteForm)
+        new_note_form.styles.display = "block"
+        new_note_form.query_one("#new-note-title", Input).focus()
+
+    @on(NewNoteForm.Created)
+    async def update_list_view(self, event: NewNoteForm.Created) -> None:
+        log.debug(
+            f"New note created, updating list view for {event.record['id']}"
+        )
+
+        list_item = self.create_list_item(event.record)
+        self.list_view.mount(list_item)
+        log.debug("List view updated with new note")
+
+        new_note_form = self.query_one(NewNoteForm)
+        new_note_form.styles.display = "none"
+        log.debug("New note form hidden after submission.")
 
     def action_reset_view(self) -> None:
         self.query_one("#note-view", ViewingPane).reset()
@@ -207,7 +262,10 @@ class Notes(HorizontalScroll):
         list_view = event.control
 
         if not list_view.highlighted_child:
-            return
+            raise ValueError("No highlighted child in ListView.")
+
+        if not list_view.highlighted_child.id:
+            raise ValueError("No ID found for highlighted child in ListView.")
 
         details = DB.records[list_view.highlighted_child.id]
         if sorted(details.keys()) != sorted(
@@ -265,6 +323,18 @@ class Notes(HorizontalScroll):
 
         elif button_id == "button-new":
             log.info("New note button pressed.")
+
+    def create_list_item(self, record: dict[str, str]) -> ListItem:
+        """Create new list item for note to live in."""
+        text = f"[ #{record['id']} ] {record['title']}"
+        label_id = f"note-label-{record['id']}"
+        label = Label(text, id=label_id)
+        list_item = ListItem(label, id=record["id"])
+        return list_item
+
+    @property
+    def list_view(self) -> ListView:
+        return self.query_one("#list-view", ListView)
 
 
 class LifeRecorderApp(App):
