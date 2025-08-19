@@ -28,15 +28,11 @@ def create() -> None:
     life_recorder = LifeRecorder()
 
     # Get user inputs
-    tag = input("What is the tag of this record? (optional): ")
+    tag = click.prompt("What is the tag of this record? (optional)", default="", show_default=False)
     
-    title = input("What is the title of this record?: ")
-    while title == "":
-        title = input("Please enter a title; it can't be blank: ")
-
-    content = input("What is the content of this record?: ")
-    while content == "":
-        content = input("Please enter a content; it can't be blank: ")
+    title = click.prompt("What is the title of this record?", type=str)
+    
+    content = click.prompt("What is the content of this record?", type=str)
 
     # Create the record
     record_data = {
@@ -46,7 +42,9 @@ def create() -> None:
     }
     
     new_record = life_recorder.create(record_data)
-    h.add_breakline(h.print_pretty_record, func_args=[new_record], both=True)
+    
+    click.echo(click.style("\nNew record created:\n", fg="green"))
+    click.echo(f"{h.pretty_record(new_record)}\n")
     sys.exit()
 
 
@@ -100,18 +98,13 @@ def update(identifier: str) -> None:
     print('Usage: Add new detail for respective field. If you want to keep '
           'any value untouched, press "Enter".')
 
-    # Get user inputs for updating
-    tag = input("What is the updated tag? (optional): ")
-    title = input("What is the updated title?: ")
-    content = input("What is the updated content?: ")
-
-    # Use existing values if user didn't provide new ones
-    if tag == "":
-        tag = old_record['tag']
-    if title == "":
-        title = old_record['title']
-    if content == "":
-        content = old_record['content']
+    # Get user inputs for updating  
+    tag = click.prompt(f"What is the updated tag? (current: '{old_record['tag']}')", 
+                       default=old_record['tag'], show_default=False)
+    title = click.prompt(f"What is the updated title? (current: '{old_record['title']}')", 
+                         default=old_record['title'], show_default=False)
+    content = click.prompt(f"What is the updated content? (current: '{old_record['content']}')", 
+                           default=old_record['content'], show_default=False)
 
     # Create updated record
     updated_record = {
@@ -121,10 +114,10 @@ def update(identifier: str) -> None:
     }
 
     # Update the record using the base class method
-    life_recorder.update(identifier, updated_record)
+    updated_record_result = life_recorder.update(identifier, updated_record)
 
-    message = f"Record with #{identifier} is updated."
-    h.add_breakline(print, func_args=[message], after=True)
+    click.echo(click.style(f"\nRecord #{identifier} updated successfully:\n", fg="green"))
+    click.echo(f"{h.pretty_record(updated_record_result)}\n")
     sys.exit()
 
 
