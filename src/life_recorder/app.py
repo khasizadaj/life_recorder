@@ -1,6 +1,11 @@
 from textual.app import App, ComposeResult
 from textual.message import Message
-from textual.containers import HorizontalScroll, VerticalScroll, VerticalGroup
+from textual.containers import (
+    HorizontalScroll,
+    VerticalScroll,
+    VerticalGroup,
+    HorizontalGroup,
+)
 from textual.widgets import (
     Footer,
     Header,
@@ -21,11 +26,31 @@ from life_recorder.base import LifeRecorder
 DB = LifeRecorder()
 
 
-class NewNoteForm(Static):
+class NoteForm(Static):
     BINDINGS = [
         ("ctrl+enter", "action_submit", "Submit the form"),
         ("enter", "action_submit", "Submit the form"),
     ]
+
+    def __init__(
+        self,
+        variant: str | None = None,
+        record_id: str | None = None,
+        *args,
+        **kwargs,
+    ):
+        if variant is not None and variant not in ["new", "update"]:
+            raise ValueError(f"Invalid variant: {variant}")
+
+        self.variant = variant if variant else "new"
+
+        if self.variant == "update":
+            if record_id is None:
+                raise ValueError(
+                    "record_id must be provided for update variant"
+                )
+        self.record_id = record_id
+        super().__init__(*args, **kwargs)
 
     def compose(self) -> ComposeResult:
         with VerticalGroup(id="new-note-container", classes="new-note"):
@@ -72,10 +97,19 @@ class NewNoteForm(Static):
             )
             yield Static("")
 
-            yield Button("Save", variant="primary", id="button-save")
+            with HorizontalGroup(id="new-note-actions"):
+                yield Button("Save", variant="primary", id="button-save")
+                yield Button("Cancel", id="button-cancel")
 
     class Created(Message):
         """Note created message."""
+
+        def __init__(self, record: dict[str, str]) -> None:
+            self.record = record
+            super().__init__()
+
+    class Updated(Message):
+        """Note updated message."""
 
         def __init__(self, record: dict[str, str]) -> None:
             self.record = record
@@ -87,8 +121,12 @@ class NewNoteForm(Static):
         validation_result = await self.validate_form()
         if not validation_result:
             return
-        note = await self.create_note()
-        self.post_message(self.Created(note))
+        if self.variant == "update":
+            note = await self.update_note()
+            self.post_message(self.Updated(note))
+        else:
+            note = await self.create_note()
+            self.post_message(self.Created(note))
         await self.reset()
 
     async def validate_form(self):
@@ -150,6 +188,25 @@ class NewNoteForm(Static):
         )
         return note
 
+    async def update_note(self) -> dict[str, str]:
+        if self.record_id is None:
+            raise ValueError("record_id must be set for update operation")
+
+        log.info(f"Updating note with provided details for {self.record_id}")
+        log.info(f"Tag: {self.tag_input.value}")
+        log.info(f"Title: {self.title_input.value}")
+        log.info(f"Content: {self.content_input.value}")
+
+        note = DB.update(
+            identifier=self.record_id,
+            record={
+                "tag": self.tag_input.value,
+                "title": self.title_input.value,
+                "content": self.content_input.value,
+            },
+        )
+        return note
+
     @property
     def tag_input(self):
         return self.query_one("#new-note-tag", Input)
@@ -162,11 +219,19 @@ class NewNoteForm(Static):
     def content_input(self):
         return self.query_one("#new-note-content", Input)
 
-    async def reset(self):
+    async def reset(self, record: dict[str, str] | None = None) -> None:
         """Reset the form inputs to their default state."""
-        self.tag_input.value = ""
-        self.title_input.value = ""
-        self.content_input.value = ""
+        if record is not None and not isinstance(record, dict):
+            raise ValueError("Invalid record format.")
+
+        if record is None:
+            self.tag_input.value = ""
+            self.title_input.value = ""
+            self.content_input.value = ""
+        else:
+            self.tag_input.value = record.get("tag", "")
+            self.title_input.value = record.get("title", "")
+            self.content_input.value = record.get("content", "")
 
         # Clear error labels and hide them
         tag_error_label = self.query_one("#new-note-error-tag", Label)
@@ -198,7 +263,13 @@ class ViewingPane(VerticalScroll):
         yield Markdown(
             "\n\nNote details will be displayed here.", id="note-content"
         )
-        yield Button("Delete", variant="error", id="button-delete")
+        with HorizontalGroup(id="note-view-actions"):
+            yield Button(
+                "Update",
+                variant="default",
+                id="button-update",
+            )
+            yield Button("Delete", variant="error", id="button-delete")
 
     def reset(self):
         """Reset the viewing pane to its default state."""
@@ -209,7 +280,9 @@ class ViewingPane(VerticalScroll):
         self.query_one("#note-content", Markdown).update(
             "\n\nNote details will be displayed here."
         )
-        self.query_one("#button-delete", Button).styles.display = "none"
+        buttons = self.query(Button)
+        for button in buttons:
+            button.styles.display = "none"
 
 
 class Notes(HorizontalScroll):
@@ -218,7 +291,7 @@ class Notes(HorizontalScroll):
     def compose(self) -> ComposeResult:
         with VerticalScroll(can_focus=False, can_focus_children=True):
             yield Button("New Note", id="button-new", variant="primary")
-            yield NewNoteForm()
+            yield NoteForm()
             yield ListView(
                 *[self.create_list_item(x) for x in DB.records.values()],
                 id="list-view",
@@ -232,14 +305,25 @@ class Notes(HorizontalScroll):
         )
 
     @on(Button.Pressed, "#button-new")
-    async def create_new_note(self, event: Button.Pressed) -> None:
+    @on(Button.Pressed, "#button-cancel")
+    async def toggle_form(self) -> None:
         log.info("New note button pressed.")
-        new_note_form = self.query_one(NewNoteForm)
-        new_note_form.styles.display = "block"
-        new_note_form.query_one("#new-note-title", Input).focus()
+        new_note_form = self.query_one(NoteForm)
+        new_note_button = self.query_one("#button-new", Button)
+        if new_note_form.styles.display == "block":
+            new_note_button.label = "New note"
+            new_note_button.disabled = False
+            new_note_form.styles.display = "none"
+            await new_note_form.reset()
+        else:
+            new_note_button.label = "Adding new note ..."
+            new_note_button.disabled = True
+            new_note_form.styles.display = "block"
+            new_note_form.variant = "new"
+            new_note_form.query_one("#new-note-title", Input).focus()
 
-    @on(NewNoteForm.Created)
-    async def update_list_view(self, event: NewNoteForm.Created) -> None:
+    @on(NoteForm.Created)
+    async def update_list_view(self, event: NoteForm.Created) -> None:
         log.debug(
             f"New note created, updating list view for {event.record['id']}"
         )
@@ -248,7 +332,29 @@ class Notes(HorizontalScroll):
         self.list_view.mount(list_item)
         log.debug("List view updated with new note")
 
-        new_note_form = self.query_one(NewNoteForm)
+        new_note_form = self.query_one(NoteForm)
+        new_note_form.styles.display = "none"
+        log.debug("New note form hidden after submission.")
+
+    @on(NoteForm.Updated)
+    def update_note_content(self, event: NoteForm.Updated) -> None:
+        log.debug(f"Updating note content for {event.record['id']}")
+        viewing_pane = self.query_one("#note-view", ViewingPane)
+        viewing_pane.query_one("#note-tag", Label).update(
+            f"🏷️ {event.record['tag']}"
+        )
+        viewing_pane.query_one("#note-title", Markdown).update(
+            f"# {event.record['title']} [ #{event.record['id']} ]"
+        )
+        viewing_pane.query_one("#note-content", Markdown).update(
+            event.record["content"]
+        )
+
+        self.update_list_view_item(event.record)
+
+        log.debug("Note content updated successfully.")
+
+        new_note_form = self.query_one(NoteForm)
         new_note_form.styles.display = "none"
         log.debug("New note form hidden after submission.")
 
@@ -298,31 +404,45 @@ class Notes(HorizontalScroll):
         for button in buttons:
             button.styles.display = "block"
 
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        button_id = event.control.id
-        if button_id is None:
+    @on(Button.Pressed, "#button-delete")
+    def delete_note(self) -> None:
+        log.info("Delete button pressed.")
+        viewing_pane = self.query_one("#note-view", ViewingPane)
+
+        log.info(f"Deleting note with ID of {viewing_pane.record_id}")
+        try:
+            DB.delete(viewing_pane.record_id)
+        except ValueError as e:
+            log.error(f"Invalid record ID: {e}")
             return
 
-        if button_id == "button-delete":
-            log.info("Delete button pressed.")
-            viewing_pane = self.query_one("#note-view", ViewingPane)
+        list_item = self.query_one(f"#{viewing_pane.record_id}", ListItem)
+        list_item.remove()
 
-            log.info(f"Deleting note with ID of {viewing_pane.record_id}")
-            try:
-                DB.delete(viewing_pane.record_id)
-            except ValueError as e:
-                log.error(f"Invalid record ID: {e}")
-                return
+        log.info(f"Deleted record with ID: {viewing_pane.record_id}")
+        viewing_pane.reset()
+        log.info("Viewing pane reset to default state.")
 
-            list_item = self.query_one(f"#{viewing_pane.record_id}", ListItem)
-            list_item.remove()
+    @on(Button.Pressed, "#button-update")
+    async def update_note(self) -> None:
+        log.info("Update note button pressed.")
+        new_note_form = self.query_one(NoteForm)
+        new_note_form.styles.display = "block"
+        new_note_form.variant = "update"
+        new_note_form.record_id = self.viewing_pane.record_id
+        log.info(f"Preparing to update note with ID: {new_note_form.__dict__}")
 
-            log.info(f"Deleted record with ID: {viewing_pane.record_id}")
-            viewing_pane.reset()
-            log.info("Viewing pane reset to default state.")
+        list_view = self.list_view
+        if not list_view.highlighted_child:
+            raise ValueError("No highlighted child in ListView.")
 
-        elif button_id == "button-new":
-            log.info("New note button pressed.")
+        if not list_view.highlighted_child.id:
+            raise ValueError("No ID found for highlighted child in ListView.")
+
+        record = DB.records[list_view.highlighted_child.id]
+        await new_note_form.reset(record=record)
+
+        new_note_form.query_one("#new-note-title", Input).focus()
 
     def create_list_item(self, record: dict[str, str]) -> ListItem:
         """Create new list item for note to live in."""
@@ -332,9 +452,18 @@ class Notes(HorizontalScroll):
         list_item = ListItem(label, id=record["id"])
         return list_item
 
+    def update_list_view_item(self, record: dict[str, str]) -> None:
+        list_item = self.query_one(f"#{record['id']}", ListItem)
+        label = list_item.query_one(Label)
+        label.update(f"[ #{record['id']} ] {record['title']}")
+
     @property
     def list_view(self) -> ListView:
         return self.query_one("#list-view", ListView)
+
+    @property
+    def viewing_pane(self):
+        return self.query_one("#note-view", ViewingPane)
 
 
 class LifeRecorderApp(App):

@@ -10,7 +10,19 @@ Button {
     margin-left: 2 
 }
 
+#note-view-actions {
+    margin-bottom: 1;
+}
+
+#note-content {
+    height: 1fr;
+}
+
 #note-view #button-delete {
+    display: none;
+}
+
+#note-view #button-update {
     display: none;
 }
 
@@ -23,12 +35,14 @@ ListView {
     }
 }
 
-NewNoteForm {
+NoteForm {
     display: none;
 }
 
 #notes #button-new {
     margin: 1;
+    padding-left: 2;
+    padding-right: 2;
 }
 
 #new-note-container {
