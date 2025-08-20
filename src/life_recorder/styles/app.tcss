@@ -35,12 +35,14 @@ ListView {
     }
 }
 
-NewNoteForm {
+NoteForm {
     display: none;
 }
 
 #notes #button-new {
     margin: 1;
+    padding-left: 2;
+    padding-right: 2;
 }
 
 #new-note-container {

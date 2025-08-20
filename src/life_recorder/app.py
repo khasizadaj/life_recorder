@@ -97,7 +97,9 @@ class NoteForm(Static):
             )
             yield Static("")
 
-            yield Button("Save", variant="primary", id="button-save")
+            with HorizontalGroup(id="new-note-actions"):
+                yield Button("Save", variant="primary", id="button-save")
+                yield Button("Cancel", id="button-cancel")
 
     class Created(Message):
         """Note created message."""
@@ -303,12 +305,22 @@ class Notes(HorizontalScroll):
         )
 
     @on(Button.Pressed, "#button-new")
-    async def create_new_note(self) -> None:
+    @on(Button.Pressed, "#button-cancel")
+    async def toggle_form(self) -> None:
         log.info("New note button pressed.")
         new_note_form = self.query_one(NoteForm)
-        new_note_form.styles.display = "block"
-        new_note_form.variant = "new"
-        new_note_form.query_one("#new-note-title", Input).focus()
+        new_note_button = self.query_one("#button-new", Button)
+        if new_note_form.styles.display == "block":
+            new_note_button.label = "New note"
+            new_note_button.disabled = False
+            new_note_form.styles.display = "none"
+            await new_note_form.reset()
+        else:
+            new_note_button.label = "Adding new note ..."
+            new_note_button.disabled = True
+            new_note_form.styles.display = "block"
+            new_note_form.variant = "new"
+            new_note_form.query_one("#new-note-title", Input).focus()
 
     @on(NoteForm.Created)
     async def update_list_view(self, event: NoteForm.Created) -> None:
