@@ -40,7 +40,7 @@ class NoteForm(Static):
         **kwargs,
     ):
         if variant is not None and variant not in ["new", "update"]:
-            raise ValueError(f"Invalid variant: {self.variant}")
+            raise ValueError(f"Invalid variant: {variant}")
 
         self.variant = variant if variant else "new"
 
