@@ -313,31 +313,24 @@ class Notes(HorizontalScroll):
         for button in buttons:
             button.styles.display = "block"
 
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        button_id = event.control.id
-        if button_id is None:
+    @on(Button.Pressed, "#button-delete")
+    def delete_note(self) -> None:
+        log.info("Delete button pressed.")
+        viewing_pane = self.query_one("#note-view", ViewingPane)
+
+        log.info(f"Deleting note with ID of {viewing_pane.record_id}")
+        try:
+            DB.delete(viewing_pane.record_id)
+        except ValueError as e:
+            log.error(f"Invalid record ID: {e}")
             return
 
-        if button_id == "button-delete":
-            log.info("Delete button pressed.")
-            viewing_pane = self.query_one("#note-view", ViewingPane)
+        list_item = self.query_one(f"#{viewing_pane.record_id}", ListItem)
+        list_item.remove()
 
-            log.info(f"Deleting note with ID of {viewing_pane.record_id}")
-            try:
-                DB.delete(viewing_pane.record_id)
-            except ValueError as e:
-                log.error(f"Invalid record ID: {e}")
-                return
-
-            list_item = self.query_one(f"#{viewing_pane.record_id}", ListItem)
-            list_item.remove()
-
-            log.info(f"Deleted record with ID: {viewing_pane.record_id}")
-            viewing_pane.reset()
-            log.info("Viewing pane reset to default state.")
-
-        elif button_id == "button-new":
-            log.info("New note button pressed.")
+        log.info(f"Deleted record with ID: {viewing_pane.record_id}")
+        viewing_pane.reset()
+        log.info("Viewing pane reset to default state.")
 
     def create_list_item(self, record: dict[str, str]) -> ListItem:
         """Create new list item for note to live in."""
