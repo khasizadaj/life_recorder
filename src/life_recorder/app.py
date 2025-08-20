@@ -167,11 +167,19 @@ class NewNoteForm(Static):
     def content_input(self):
         return self.query_one("#new-note-content", Input)
 
-    async def reset(self):
+    async def reset(self, record: dict[str, str] | None = None) -> None:
         """Reset the form inputs to their default state."""
-        self.tag_input.value = ""
-        self.title_input.value = ""
-        self.content_input.value = ""
+        if record is not None and not isinstance(record, dict):
+            raise ValueError("Invalid record format.")
+
+        if record is None:
+            self.tag_input.value = ""
+            self.title_input.value = ""
+            self.content_input.value = ""
+        else:
+            self.tag_input.value = record.get("tag", "")
+            self.title_input.value = record.get("title", "")
+            self.content_input.value = record.get("content", "")
 
         # Clear error labels and hide them
         tag_error_label = self.query_one("#new-note-error-tag", Label)
@@ -208,8 +216,6 @@ class ViewingPane(VerticalScroll):
                 "Update",
                 variant="default",
                 id="button-update",
-                disabled=True,
-                tooltip="Update functionality not implemented yet",
             )
             yield Button("Delete", variant="error", id="button-delete")
 
@@ -331,6 +337,24 @@ class Notes(HorizontalScroll):
         log.info(f"Deleted record with ID: {viewing_pane.record_id}")
         viewing_pane.reset()
         log.info("Viewing pane reset to default state.")
+
+    @on(Button.Pressed, "#button-update")
+    async def update_note(self) -> None:
+        log.info("Update note button pressed.")
+        new_note_form = self.query_one(NewNoteForm)
+        new_note_form.styles.display = "block"
+
+        list_view = self.list_view
+        if not list_view.highlighted_child:
+            raise ValueError("No highlighted child in ListView.")
+
+        if not list_view.highlighted_child.id:
+            raise ValueError("No ID found for highlighted child in ListView.")
+
+        record = DB.records[list_view.highlighted_child.id]
+        await new_note_form.reset(record=record)
+
+        new_note_form.query_one("#new-note-title", Input).focus()
 
     def create_list_item(self, record: dict[str, str]) -> ListItem:
         """Create new list item for note to live in."""
