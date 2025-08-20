@@ -1,6 +1,11 @@
 from textual.app import App, ComposeResult
 from textual.message import Message
-from textual.containers import HorizontalScroll, VerticalScroll, VerticalGroup
+from textual.containers import (
+    HorizontalScroll,
+    VerticalScroll,
+    VerticalGroup,
+    HorizontalGroup,
+)
 from textual.widgets import (
     Footer,
     Header,
@@ -198,7 +203,15 @@ class ViewingPane(VerticalScroll):
         yield Markdown(
             "\n\nNote details will be displayed here.", id="note-content"
         )
-        yield Button("Delete", variant="error", id="button-delete")
+        with HorizontalGroup(id="note-view-actions"):
+            yield Button(
+                "Update",
+                variant="default",
+                id="button-update",
+                disabled=True,
+                tooltip="Update functionality not implemented yet",
+            )
+            yield Button("Delete", variant="error", id="button-delete")
 
     def reset(self):
         """Reset the viewing pane to its default state."""
@@ -209,7 +222,9 @@ class ViewingPane(VerticalScroll):
         self.query_one("#note-content", Markdown).update(
             "\n\nNote details will be displayed here."
         )
-        self.query_one("#button-delete", Button).styles.display = "none"
+        buttons = self.query(Button)
+        for button in buttons:
+            button.styles.display = "none"
 
 
 class Notes(HorizontalScroll):
