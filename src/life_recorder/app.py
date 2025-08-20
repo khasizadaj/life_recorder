@@ -455,8 +455,7 @@ class Notes(HorizontalScroll):
     def update_list_view_item(self, record: dict[str, str]) -> None:
         list_item = self.query_one(f"#{record['id']}", ListItem)
         label = list_item.query_one(Label)
-        if list_item:
-            label.update(f"[ #{record['id']} ] {record['title']}")
+        label.update(f"[ #{record['id']} ] {record['title']}")
 
     @property
     def list_view(self) -> ListView:
