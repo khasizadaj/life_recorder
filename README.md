@@ -20,7 +20,7 @@ pip install .
 
 ## Usage
 
-You can either use CLI or use terminal app. After installing library you get access to two new executable: `life_recorder` and `life_recorder-app`
+You can either use CLI or use terminal app. After installing library you get access to two new executables: `life_recorder` and `life_recorder-app`
 
 `life_recorder` is CLI executable that let's you perform CRUD operations:
 
