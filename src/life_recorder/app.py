@@ -317,13 +317,14 @@ class Notes(HorizontalScroll):
     @on(Button.Pressed, "#button-cancel")
     async def toggle_form(self) -> None:
         log.info("New note button pressed.")
-        self.toggle_button_new()
 
         new_note_form = self.query_one(NoteForm)
         if new_note_form.styles.display == "block":
+            self.toggle_button_new()
             new_note_form.styles.display = "none"
             await new_note_form.reset()
         else:
+            self.toggle_button_new()
             new_note_form.styles.display = "block"
             new_note_form.variant = "new"
             new_note_form.query_one("#new-note-title", Input).focus()
