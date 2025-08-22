@@ -20,15 +20,31 @@ pip install .
 
 ## Usage
 
-```shell
-# run as python script
-$ life_recorder <command> <identifier>
+You can either use CLI or use terminal app. After installing library you get access to two new executables: `life_recorder` and `life_recorder-app`
 
-# run as an .exe file
-$ life_recorder <command> <identifier>
+`life_recorder` is CLI executable that let's you perform CRUD operations:
+
+```shell
+$ life_recorder read lr-1
+Id: #lr-2
+Timestamp: 18-Aug-2025 22:40
+Tag: dream
+Title: Note from a dream
+Content: I was chased by a duck in a tuxedo. The duck won.
 ```
 
-> For example: `life_recorder read lr-1`
+`life_recorder-app` is a terminal app that lets you visualize your notes from terminal with UI or navigate using your keyboard.
+
+```shell
+$ life_recorder-app
+```
+
+![Image of first screen](./docs/images/first-screen.png)
+
+> [!info] Note: Each option uses the same database, i.e. JSON file, however offers different interface to interact with it.
+
+> [!info] Note: Terminal app was built with [Textual](https://github.com/textualize/textual).
+
 
 ### Commands
 
@@ -170,7 +186,3 @@ To run tests, run the following command:
 $ poetry install --with dev
 $ poetry run python -m unittest discover -v -s tests -p 'test_*.py' --failfast
 ```
-
-### using .exe file
-
-**TBA**
