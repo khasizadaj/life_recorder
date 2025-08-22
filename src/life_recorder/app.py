@@ -304,20 +304,26 @@ class Notes(HorizontalScroll):
             can_focus_children=True,
         )
 
+    def toggle_button_new(self):
+        new_note_button = self.query_one("#button-new", Button)
+        if new_note_button.disabled:
+            new_note_button.label = "New note"
+            new_note_button.disabled = False
+        else:
+            new_note_button.label = "Adding new note ..."
+            new_note_button.disabled = True
+
     @on(Button.Pressed, "#button-new")
     @on(Button.Pressed, "#button-cancel")
     async def toggle_form(self) -> None:
         log.info("New note button pressed.")
+        self.toggle_button_new()
+
         new_note_form = self.query_one(NoteForm)
-        new_note_button = self.query_one("#button-new", Button)
         if new_note_form.styles.display == "block":
-            new_note_button.label = "New note"
-            new_note_button.disabled = False
             new_note_form.styles.display = "none"
             await new_note_form.reset()
         else:
-            new_note_button.label = "Adding new note ..."
-            new_note_button.disabled = True
             new_note_form.styles.display = "block"
             new_note_form.variant = "new"
             new_note_form.query_one("#new-note-title", Input).focus()
@@ -335,6 +341,8 @@ class Notes(HorizontalScroll):
         new_note_form = self.query_one(NoteForm)
         new_note_form.styles.display = "none"
         log.debug("New note form hidden after submission.")
+
+        self.toggle_button_new()
 
     @on(NoteForm.Updated)
     def update_note_content(self, event: NoteForm.Updated) -> None:
@@ -357,6 +365,8 @@ class Notes(HorizontalScroll):
         new_note_form = self.query_one(NoteForm)
         new_note_form.styles.display = "none"
         log.debug("New note form hidden after submission.")
+
+        self.toggle_button_new()
 
     def action_reset_view(self) -> None:
         self.query_one("#note-view", ViewingPane).reset()
