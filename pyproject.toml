@@ -1,6 +1,6 @@
 [project]
 name = "life-recorder"
-version = "0.2.0"
+version = "0.3.0"
 description = "A simple CLI tool for recording life events"
 readme = "README.md"
 authors = [
