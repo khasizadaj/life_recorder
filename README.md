@@ -33,7 +33,7 @@ Title: Note from a dream
 Content: I was chased by a duck in a tuxedo. The duck won.
 ```
 
-`life_recorder-app` is terminal app that let's you visualize your your notes from terminal with UI or navigate using your keyboard.
+`life_recorder-app` is a terminal app that lets you visualize your notes from terminal with UI or navigate using your keyboard.
 
 ```shell
 $ life_recorder-app
